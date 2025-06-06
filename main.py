@@ -4,18 +4,17 @@
 
 import pygame, time
 
-#
-# definitions 
-#
 
 FPS = 30 # Frames Per Second
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-BALL_WIDTH = 16
-BALL_HEIGHT = 16
+PADDLE_WIDTH = 144
+PADDLE_HEIGHT = 32
 
-ball_x = 0
-ball_speed_x = 6
+player_x = SCREEN_WIDTH / 2
+player_y = SCREEN_HEIGHT - 100
+player_speed_x = 10
+player_speed_y = 10
 
 #
 # init game
@@ -32,13 +31,15 @@ fps_clock = pygame.time.Clock()
 
 spritesheet = pygame.image.load('Breakout_Tile_Free.png').convert_alpha()   
 
-ball_img = pygame.Surface((64, 64), pygame.SRCALPHA)  
-ball_img.blit(spritesheet, (0, 0), (1403, 652, 64, 64))   
-ball_img = pygame.transform.scale(ball_img, (BALL_WIDTH, BALL_HEIGHT))  
+player_img = pygame.Surface((243, 64), pygame.SRCALPHA)  
+player_img.blit(spritesheet, (0, 0), (1158, 462, 243, 64))   
+player_img = pygame.transform.scale(player_img, (PADDLE_WIDTH, PADDLE_HEIGHT))
 
 #
 # game loop
 #
+
+
 
 print('mygame is running')
 running = True
@@ -50,41 +51,35 @@ while running:
         if event.type == pygame.QUIT:  
             running = False 
     keys = pygame.key.get_pressed() 
-            
-    # 
-    # move everything
-    #
+   
+    if keys[pygame.K_a] :
+      player_x = player_x - player_speed_x
 
-    # move ball
-    ball_x = ball_x + ball_speed_x
-
-    # bounce ball
-    if ball_x < 0 : 
-      ball_speed_x = abs(ball_speed_x) 
-    if ball_x + BALL_WIDTH > SCREEN_WIDTH: 
-      ball_speed_x = abs(ball_speed_x) * -1 
-
-    # 
-    # handle collisions
-    #
+    if keys[pygame.K_s] :
+      player_y = player_y + paddle_speed_y
+    if keys[pygame.K_w] :
+      paddle_y = paddle_y - paddle_speed_y
+    if keys[pygame.K_d] :
+      paddle_x = paddle_x + paddle_speed_x
     
-    # 
-    # draw everything
-    #
-
-    # clear screen
+    if paddle_x + PADDLE_WIDTH > SCREEN_WIDTH:
+       paddle_x = SCREEN_WIDTH - PADDLE_WIDTH
+    if paddle_x < 1:
+       paddle_x = 1    
+    if paddle_y + PADDLE_HEIGHT > SCREEN_HEIGHT:
+       paddle_y = SCREEN_HEIGHT - PADDLE_HEIGHT
+    if paddle_y < 1:
+       paddle_y = 1     
     screen.fill('black') 
 
-    # draw ball
-    screen.blit(ball_img, (ball_x, 0))
-    
-    # show screen
+    screen.blit(paddle_img, (paddle_x, paddle_y))
+   
     pygame.display.flip() 
 
     # 
     # wait until next frame
     #
 
-    fps_clock.tick(FPS) # Sleep the remaining time of this frame
+    fps_clock.tick(FPS) 
 
 print('mygame stopt running')
