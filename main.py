@@ -8,8 +8,19 @@ import pygame, time
 FPS = 30 # Frames Per Second
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-PLAYER_WIDTH = 144
-PLAYER_HEIGHT = 32
+PLAYER_WIDTH = 40
+PLAYER_HEIGHT = 70
+MONSTER_HEIGHT = 50
+MONSTER_WIDTH = 40
+
+monster_x = 0
+monster_y = 0
+monster_speed_x = 7
+monster_speed_y = 7
+monster_x = monster_x + monster_speed_x
+monster_y = monster_y + monster_speed_y
+
+
 
 player_x = SCREEN_WIDTH / 2
 player_y = SCREEN_HEIGHT - 100
@@ -35,9 +46,15 @@ player_img = pygame.Surface((243, 64), pygame.SRCALPHA)
 player_img.blit(spritesheet, (0, 0), (1158, 462, 243, 64))   
 player_img = pygame.transform.scale(player_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
+monster_img = pygame.Surface((380, 128), pygame.SRCALPHA)  
+monster_img.blit(spritesheet, (0, 0), (0, 130, 384, 128))   
+Monster_img = pygame.transform.scale(monster_img, (MONSTER_WIDTH, MONSTER_HEIGHT))
 #
 # game loop
 #
+#collisions
+#   
+
 
 
 
@@ -73,7 +90,7 @@ while running:
     screen.fill('black') 
 
     screen.blit(player_img, (player_x, player_y))
-   
+    screen.blit(Monster_img, (monster_x, monster_y))
     pygame.display.flip() 
 
     # 
