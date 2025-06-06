@@ -8,8 +8,8 @@ import pygame, time
 FPS = 30 # Frames Per Second
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-PADDLE_WIDTH = 144
-PADDLE_HEIGHT = 32
+PLAYER_WIDTH = 144
+PLAYER_HEIGHT = 32
 
 player_x = SCREEN_WIDTH / 2
 player_y = SCREEN_HEIGHT - 100
@@ -33,7 +33,7 @@ spritesheet = pygame.image.load('Breakout_Tile_Free.png').convert_alpha()
 
 player_img = pygame.Surface((243, 64), pygame.SRCALPHA)  
 player_img.blit(spritesheet, (0, 0), (1158, 462, 243, 64))   
-player_img = pygame.transform.scale(player_img, (PADDLE_WIDTH, PADDLE_HEIGHT))
+player_img = pygame.transform.scale(player_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 #
 # game loop
@@ -56,23 +56,23 @@ while running:
       player_x = player_x - player_speed_x
 
     if keys[pygame.K_s] :
-      player_y = player_y + paddle_speed_y
+      player_y = player_y + player_speed_y
     if keys[pygame.K_w] :
-      paddle_y = paddle_y - paddle_speed_y
+      player_y = player_y - player_speed_y
     if keys[pygame.K_d] :
-      paddle_x = paddle_x + paddle_speed_x
+      player_x = player_x + player_speed_x
     
-    if paddle_x + PADDLE_WIDTH > SCREEN_WIDTH:
-       paddle_x = SCREEN_WIDTH - PADDLE_WIDTH
-    if paddle_x < 1:
-       paddle_x = 1    
-    if paddle_y + PADDLE_HEIGHT > SCREEN_HEIGHT:
-       paddle_y = SCREEN_HEIGHT - PADDLE_HEIGHT
-    if paddle_y < 1:
-       paddle_y = 1     
+    if player_x + PLAYER_WIDTH > SCREEN_WIDTH:
+       player_x = SCREEN_WIDTH - PLAYER_WIDTH
+    if player_x < 1:
+       player_x = 1    
+    if player_y + PLAYER_HEIGHT > SCREEN_HEIGHT:
+       player_y = SCREEN_HEIGHT - PLAYER_HEIGHT
+    if player_y < 1:
+       player_y = 1     
     screen.fill('black') 
 
-    screen.blit(paddle_img, (paddle_x, paddle_y))
+    screen.blit(player_img, (player_x, player_y))
    
     pygame.display.flip() 
 
