@@ -1,5 +1,5 @@
 #
-# BREAKOUT GAME 
+# GAME BASTIAAN EN CHÉ
 #
 
 import pygame, time
@@ -14,11 +14,11 @@ MONSTER_HEIGHT = 50
 MONSTER_WIDTH = 40
 
 monster_x = 0
+monster_speed_x = 6
 monster_y = 0
-monster_speed_x = 7
-monster_speed_y = 7
-monster_x = monster_x + monster_speed_x
-monster_y = monster_y + monster_speed_y
+monster_speed_y = 6
+
+
 
 
 
@@ -93,6 +93,13 @@ while running:
     screen.blit(Monster_img, (monster_x, monster_y))
     pygame.display.flip() 
 
+    monster_x = monster_x + monster_speed_x
+    monster_y = monster_y + monster_speed_y
+
+    if monster_x < 0 or monster_x + MONSTER_WIDTH > SCREEN_WIDTH:
+       monster_speed_x *= -1
+    if monster_y < 0 or monster_y + MONSTER_HEIGHT > SCREEN_HEIGHT:
+       monster_speed_y *= -1
     # 
     # wait until next frame
     #
