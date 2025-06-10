@@ -75,7 +75,7 @@ while running:
     screen.blit(player_img, (player_x, player_y))
 
     # BEWEEG EN TEKEN MONSTERS
-    for monster in monsters:
+    for i, monster in enumerate(monsters):
         dx = player_x - monster["x"]
         dy = player_y - monster["y"]
         distance = math.hypot(dx, dy)
@@ -86,7 +86,6 @@ while running:
             monster["x"] += dx * monster["speed"]
             monster["y"] += dy * monster["speed"]
 
-        # TEKEN MONSTER
         screen.blit(Monster_img, (monster["x"], monster["y"]))
 
         # BOTST MET SPELER?
@@ -94,10 +93,31 @@ while running:
             monster["x"] < player_x + PLAYER_WIDTH and
             monster["y"] + MONSTER_HEIGHT > player_y and
             monster["y"] < player_y + PLAYER_HEIGHT):
-            print("Gepakt!")
-            
+            print(f"Monster {i} pakt speler!")
 
+    # BOTST MONSTERS MET ELKAAR?
+    for i, monster in enumerate(monsters):
+        for j, other in enumerate(monsters):
+            if i == j:
+                continue
+
+            if (monster["x"] + MONSTER_WIDTH > other["x"] and
+                monster["x"] < other["x"] + MONSTER_WIDTH and
+                monster["y"] + MONSTER_HEIGHT > other["y"] and
+                monster["y"] < other["y"] + MONSTER_HEIGHT):
+
+                dx = other["x"] - monster["x"]
+                dy = other["y"] - monster["y"]
+                distance = math.hypot(dx, dy)
+                if distance != 0:
+                    dx /= distance
+                    dy /= distance
+                    monster["x"] -= dx * monster["speed"]
+                    monster["y"] -= dy * monster["speed"]
+
+    # VERVERS SCHERM
     pygame.display.flip()
     fps_clock.tick(FPS)
 
 print('mygame stopt running')
+            
