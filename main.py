@@ -46,7 +46,7 @@ for i in range(MONSTER_COUNT):
     monsters.append({
         "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
         "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
-        "speed": 2
+        "speed": 3
     })
 
 background_img = pygame.image.load("pixilart-drawing (1).png").convert()
@@ -72,7 +72,8 @@ while running:
 
     # SPELER BINNEN SCHERM HOUDEN
     player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
-    player_y = max(0, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
+    player_y = max(42, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
+    
 
     # SCHERM VERVERSEN
     screen.blit(background_img, (0, 0))
