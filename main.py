@@ -8,10 +8,10 @@ import pygame, random, math
 FPS = 30
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-PLAYER_WIDTH = 40
-PLAYER_HEIGHT = 70
-MONSTER_WIDTH = 40
-MONSTER_HEIGHT = 50
+PLAYER_WIDTH = 120
+PLAYER_HEIGHT = 150
+MONSTER_WIDTH = 100
+MONSTER_HEIGHT = 100
 MONSTER_COUNT = 5
 
 # INIT PLAYER
@@ -28,15 +28,16 @@ fps_clock = pygame.time.Clock()
 
 # LAAD SPRITESHEET
 spritesheet = pygame.image.load('pixilart-drawing (2).png').convert_alpha()
+spritesheet1 = pygame.image.load("pixilart-drawing.png").convert_alpha()
 
 # SPELER AFBEELDING
-player_img = pygame.Surface((243, 64), pygame.SRCALPHA)
-player_img.blit(spritesheet, (0, 0), (1158, 462, 243, 64))
+player_img = pygame.Surface((60, 90), pygame.SRCALPHA)
+player_img.blit(spritesheet, (0, 0), (0, 0, 1111, 1100))
 player_img = pygame.transform.scale(player_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 # MONSTER AFBEELDING
-monster_img = pygame.Surface((380, 128), pygame.SRCALPHA)
-monster_img.blit(spritesheet, (0, 0), (0, 130, 384, 128))
+monster_img = pygame.Surface((60, 60), pygame.SRCALPHA)
+monster_img.blit(spritesheet1, (0, 0), (0, 0, 384, 128))
 Monster_img = pygame.transform.scale(monster_img, (MONSTER_WIDTH, MONSTER_HEIGHT))
 
 # MEERDERE MONSTERS AANMAKEN
