@@ -46,8 +46,11 @@ for i in range(MONSTER_COUNT):
     monsters.append({
         "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
         "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
-        "speed": 7
+        "speed": 2
     })
+
+background_img = pygame.image.load("pixilart-drawing (1).png").convert()
+background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 print('mygame is running')
 running = True
@@ -72,9 +75,8 @@ while running:
     player_y = max(0, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
 
     # SCHERM VERVERSEN
-    screen.fill('black')
+    screen.blit(background_img, (0, 0))
     screen.blit(player_img, (player_x, player_y))
-
     # BEWEEG EN TEKEN MONSTERS
     for i, monster in enumerate(monsters):
         dx = player_x - monster["x"]
