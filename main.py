@@ -27,7 +27,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREE
 fps_clock = pygame.time.Clock()
 
 # LAAD SPRITESHEET
-spritesheet = pygame.image.load('Breakout_Tile_Free.png').convert_alpha()
+spritesheet = pygame.image.load('pixilart-drawing (2).png').convert_alpha()
 
 # SPELER AFBEELDING
 player_img = pygame.Surface((243, 64), pygame.SRCALPHA)
