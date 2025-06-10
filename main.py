@@ -27,8 +27,8 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREE
 fps_clock = pygame.time.Clock()
 
 # LAAD SPRITESHEET
-spritesheet = pygame.image.load('pixilart-drawing (2).png').convert_alpha()
-spritesheet1 = pygame.image.load("pixilart-drawing.png").convert_alpha()
+spritesheet = pygame.image.load('Player.png').convert_alpha()
+spritesheet1 = pygame.image.load("monster.png").convert_alpha()
 
 # SPELER AFBEELDING
 player_img = pygame.Surface((60, 90), pygame.SRCALPHA)
@@ -36,8 +36,8 @@ player_img.blit(spritesheet, (0, 0), (0, 0, 1111, 1100))
 player_img = pygame.transform.scale(player_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 # MONSTER AFBEELDING
-monster_img = pygame.Surface((60, 60), pygame.SRCALPHA)
-monster_img.blit(spritesheet1, (0, 0), (0, 0, 384, 128))
+monster_img = pygame.Surface((70, 70), pygame.SRCALPHA)
+monster_img.blit(spritesheet1, (0, 0), (0, 0, 50, 50))
 Monster_img = pygame.transform.scale(monster_img, (MONSTER_WIDTH, MONSTER_HEIGHT))
 
 # MEERDERE MONSTERS AANMAKEN
@@ -93,12 +93,13 @@ while running:
         screen.blit(Monster_img, (monster["x"], monster["y"]))
 
         # BOTST MET SPELER?
-        if (monster["x"] + MONSTER_WIDTH > player_x and
-            monster["x"] < player_x + PLAYER_WIDTH and
-            monster["y"] + MONSTER_HEIGHT > player_y and
-            monster["y"] < player_y + PLAYER_HEIGHT):
-            print(f"Monster {i} pakt speler!")
+        HITBOX_OFFSET = 50
 
+        if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > player_x and
+            monster["x"] + HITBOX_OFFSET < player_x + PLAYER_WIDTH and
+            monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
+            monster["y"] + HITBOX_OFFSET < player_y + PLAYER_HEIGHT):
+            print(f"Monster {i} pakt speler!")
     # BOTST MONSTERS MET ELKAAR?
     for i, monster in enumerate(monsters):
         for j, other in enumerate(monsters):
