@@ -13,12 +13,22 @@ PLAYER_HEIGHT = 150
 MONSTER_WIDTH = 100
 MONSTER_HEIGHT = 100
 MONSTER_COUNT = 5
+WEAPON_WIDTH = 100
+WEAPON_HEIGHT = 150
+weapon_angle = 0  # initial angle in degrees
+weapon_radius = 100  # distance from player to weapon center
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
 player_y = SCREEN_HEIGHT - 100
 player_speed_x = 10
 player_speed_y = 10
+
+# INIT WEAPON
+weapon_x = SCREEN_WIDTH / 2 
+weapon_y = SCREEN_HEIGHT - 250
+weapon_speed_x = 10
+weapon_speed_y = 10
 
 # INIT PYGAME
 pygame.init()
@@ -29,6 +39,7 @@ fps_clock = pygame.time.Clock()
 # LAAD SPRITESHEET
 spritesheet = pygame.image.load('Player.png').convert_alpha()
 spritesheet1 = pygame.image.load("monster.png").convert_alpha()
+spritesheet2 = pygame.image.load("legendary_sword.png").convert_alpha()
 
 # SPELER AFBEELDING
 player_img = pygame.Surface((60, 90), pygame.SRCALPHA)
@@ -39,6 +50,11 @@ player_img = pygame.transform.scale(player_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 monster_img = pygame.Surface((70, 70), pygame.SRCALPHA)
 monster_img.blit(spritesheet1, (0, 0), (0, 0, 50, 50))
 Monster_img = pygame.transform.scale(monster_img, (MONSTER_WIDTH, MONSTER_HEIGHT))
+
+# ZWAARD AFBEELDING
+weapon_img = pygame.Surface((60, 90), pygame.SRCALPHA)
+weapon_img.blit(spritesheet2, (0, 0), (0, 0, 1111, 1100))
+weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
 
 # MEERDERE MONSTERS AANMAKEN
 monsters = []
@@ -69,15 +85,36 @@ while running:
         player_y -= player_speed_y
     if keys[pygame.K_s]:
         player_y += player_speed_y
+    
+    # Update weapon angle to spin
+    weapon_angle = (weapon_angle + 5) % 360  # spin speed, 5 degrees per frame
+
+# Calculate weapon position around player using polar coordinates
+    weapon_x = player_x + PLAYER_WIDTH / 3.5 + weapon_radius * math.cos(math.radians(weapon_angle)) - WEAPON_WIDTH / 2
+    weapon_y = player_y + PLAYER_HEIGHT / 3.5 + weapon_radius * math.sin(math.radians(weapon_angle)) - WEAPON_HEIGHT / 2
+
+# Optional: rotate weapon image to match angle
+    rotated_weapon_img = pygame.transform.rotate(weapon_img, -weapon_angle)
+    rotated_rect = rotated_weapon_img.get_rect(center=(weapon_x + WEAPON_WIDTH / 2, weapon_y + WEAPON_HEIGHT / 2))
+    
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_a]:
+        weapon_x -= weapon_speed_x
+    if keys[pygame.K_d]:
+        weapon_x += weapon_speed_x
+    if keys[pygame.K_w]:
+        weapon_y -= weapon_speed_y
+    if keys[pygame.K_s]:
+        weapon_y += weapon_speed_y
 
     # SPELER BINNEN SCHERM HOUDEN
     player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
     player_y = max(42, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
-    
 
     # SCHERM VERVERSEN
     screen.blit(background_img, (0, 0))
     screen.blit(player_img, (player_x, player_y))
+    screen.blit(rotated_weapon_img, rotated_rect.topleft)
     # BEWEEG EN TEKEN MONSTERS
     for i, monster in enumerate(monsters):
         dx = player_x - monster["x"]
