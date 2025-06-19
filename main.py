@@ -137,6 +137,16 @@ while running:
             monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
             monster["y"] + HITBOX_OFFSET < player_y + PLAYER_HEIGHT):
             print(f"Monster {i} pakt speler!")
+
+        if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > weapon_x and
+            monster["x"] + HITBOX_OFFSET < weapon_x + WEAPON_WIDTH and
+            monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > weapon_y and
+            monster["y"] + HITBOX_OFFSET < weapon_y + WEAPON_HEIGHT):
+            print(f"Monster {i} je you ded buddy! GG")
+            monster["speed"] = 0
+            monster["speed"] = 0
+            monster["x"] = 0
+            monster['y'] = 0
     # BOTST MONSTERS MET ELKAAR?
     for i, monster in enumerate(monsters):
         for j, other in enumerate(monsters):
