@@ -69,13 +69,16 @@ background_img = pygame.image.load("pixilart-drawing (1).png").convert()
 background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 print('mygame is running')
+
+start_ticks = pygame.time.get_ticks() 
+
 running = True
 while running:
     # EVENTS
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+    
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a]:
         player_x -= player_speed_x
@@ -166,7 +169,19 @@ while running:
                     dy /= distance
                     monster["x"] -= dx * monster["speed"]
                     monster["y"] -= dy * monster["speed"]
-
+ 
+    elapsed_ms = pygame.time.get_ticks() - start_ticks
+    elapsed_sec = elapsed_ms // 1000  
+   
+    remaining_time = max(0, 10 - elapsed_sec)
+   
+    timer_text = font.render(f'Time left: {remaining_time}s', True, (255, 255, 255))
+    screen.blit(timer_text, (50, 50)) 
+    
+    if remaining_time == 0:
+        print("Time's up!")
+        pygame.time.wait(1000)
+    
     # VERVERS SCHERM
     pygame.display.flip()
     fps_clock.tick(FPS)
