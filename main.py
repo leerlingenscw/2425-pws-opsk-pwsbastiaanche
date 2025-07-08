@@ -72,6 +72,7 @@ background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HE
 print('mygame is running')
 
 start_ticks = pygame.time.get_ticks() 
+game_paused = False
 
 running = True
 while running:
@@ -79,111 +80,118 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_a]:
-        player_x -= player_speed_x
-    if keys[pygame.K_d]:
-        player_x += player_speed_x
-    if keys[pygame.K_w]:
-        player_y -= player_speed_y
-    if keys[pygame.K_s]:
-        player_y += player_speed_y
-    
-    # Update weapon angle to spin
-    weapon_angle = (weapon_angle + 5) % 360  # spin speed, 5 degrees per frame
 
-# Calculate weapon position around player using polar coordinates
-    weapon_x = player_x + PLAYER_WIDTH / 3.5 + weapon_radius * math.cos(math.radians(weapon_angle)) - WEAPON_WIDTH / 2
-    weapon_y = player_y + PLAYER_HEIGHT / 3.5 + weapon_radius * math.sin(math.radians(weapon_angle)) - WEAPON_HEIGHT / 2
+    elapsed_ms = pygame.time.get_ticks() - start_ticks
+    elapsed_sec = elapsed_ms // 1000  
 
-# Optional: rotate weapon image to match angle
-    rotated_weapon_img = pygame.transform.rotate(weapon_img, -weapon_angle)
-    rotated_rect = rotated_weapon_img.get_rect(center=(weapon_x + WEAPON_WIDTH / 2, weapon_y + WEAPON_HEIGHT / 2))
-    
-    # SPELER BINNEN SCHERM HOUDEN
-    player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
-    player_y = max(42, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
+    remaining_time = max(0, 10 - elapsed_sec)
+    down_time = max(0, 20 - elapsed_sec)
 
-    # SCHERM VERVERSEN
-    screen.blit(background_img, (0, 0))
-    screen.blit(player_img, (player_x, player_y))
-    screen.blit(rotated_weapon_img, rotated_rect.topleft)
-    # BEWEEG EN TEKEN MONSTERS
-    for i, monster in enumerate(monsters):
-        dx = player_x - monster["x"]
-        dy = player_y - monster["y"]
-        distance = math.hypot(dx, dy)
+    # Pauzeer spel als tijd op is
+    if remaining_time == 0 and not game_paused:
+        print("Time's up!")
+        game_paused = True
 
-        if distance != 0:
-            dx /= distance
-            dy /= distance
-            monster["x"] += dx * monster["speed"]
-            monster["y"] += dy * monster["speed"]
+    # Herstart spel na down_time
+    if down_time == 0 and game_paused:
+        print("Down time is over")
+        start_ticks = pygame.time.get_ticks()  # reset timer
+        game_paused = False
 
-        screen.blit(Monster_img, (monster["x"], monster["y"]))
+    if not game_paused:
+        # SPELER INPUT
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            player_x -= player_speed_x
+        if keys[pygame.K_d]:
+            player_x += player_speed_x
+        if keys[pygame.K_w]:
+            player_y -= player_speed_y
+        if keys[pygame.K_s]:
+            player_y += player_speed_y
 
-        # BOTST MET SPELER?
-        HITBOX_OFFSET = 50
+        # Update weapon angle to spin
+        weapon_angle = (weapon_angle + 5) % 360
 
-        if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > player_x and
-            monster["x"] + HITBOX_OFFSET < player_x + PLAYER_WIDTH and
-            monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
-            monster["y"] + HITBOX_OFFSET < player_y + PLAYER_HEIGHT):
-            print(f"Monster {i} pakt speler!")
+        # Wapenpositie
+        weapon_x = player_x + PLAYER_WIDTH / 3.5 + weapon_radius * math.cos(math.radians(weapon_angle)) - WEAPON_WIDTH / 2
+        weapon_y = player_y + PLAYER_HEIGHT / 3.5 + weapon_radius * math.sin(math.radians(weapon_angle)) - WEAPON_HEIGHT / 2
+        rotated_weapon_img = pygame.transform.rotate(weapon_img, -weapon_angle)
+        rotated_rect = rotated_weapon_img.get_rect(center=(weapon_x + WEAPON_WIDTH / 2, weapon_y + WEAPON_HEIGHT / 2))
 
-        if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > weapon_x and
-            monster["x"] + HITBOX_OFFSET < weapon_x + WEAPON_WIDTH and
-            monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > weapon_y and
-            monster["y"] + HITBOX_OFFSET < weapon_y + WEAPON_HEIGHT):
-            print(f"Monster {i} je you ded buddy! GG")
-   # Bounce monster away from the weapon
-            dx = monster["x"] - weapon_x
-            dy = monster["y"] - weapon_y
+        # SPELER BINNEN SCHERM HOUDEN
+        player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
+        player_y = max(42, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
+
+        # BEWEEG EN TEKEN MONSTERS
+        for i, monster in enumerate(monsters):
+            dx = player_x - monster["x"]
+            dy = player_y - monster["y"]
             distance = math.hypot(dx, dy)
-
             if distance != 0:
                 dx /= distance
                 dy /= distance
+                monster["x"] += dx * monster["speed"]
+                monster["y"] += dy * monster["speed"]
 
-                monster["x"] += dx * bounce_strength
-                monster["y"] += dy * bounce_strength
-    # BOTST MONSTERS MET ELKAAR?
-    for i, monster in enumerate(monsters):
-        for j, other in enumerate(monsters):
-            if i == j:
-                continue
+        # BOTST MONSTERS MET ELKAAR?
+        for i, monster in enumerate(monsters):
+            for j, other in enumerate(monsters):
+                if i == j:
+                    continue
+                if (monster["x"] + MONSTER_WIDTH > other["x"] and
+                    monster["x"] < other["x"] + MONSTER_WIDTH and
+                    monster["y"] + MONSTER_HEIGHT > other["y"] and
+                    monster["y"] < other["y"] + MONSTER_HEIGHT):
 
-            if (monster["x"] + MONSTER_WIDTH > other["x"] and
-                monster["x"] < other["x"] + MONSTER_WIDTH and
-                monster["y"] + MONSTER_HEIGHT > other["y"] and
-                monster["y"] < other["y"] + MONSTER_HEIGHT):
+                    dx = other["x"] - monster["x"]
+                    dy = other["y"] - monster["y"]
+                    distance = math.hypot(dx, dy)
+                    if distance != 0:
+                        dx /= distance
+                        dy /= distance
+                        monster["x"] -= dx * monster["speed"]
+                        monster["y"] -= dy * monster["speed"]
 
-                dx = other["x"] - monster["x"]
-                dy = other["y"] - monster["y"]
+    # SCHERM VERVERSEN (ALTIJD LATEN ZIEN, OOK IN PAUZE)
+    screen.blit(background_img, (0, 0))
+    screen.blit(player_img, (player_x, player_y))
+    screen.blit(rotated_weapon_img, rotated_rect.topleft)
+
+    # MONSTERS TEKENEN (ZONDER BEWEGING IN PAUZE)
+    for monster in monsters:
+        screen.blit(Monster_img, (monster["x"], monster["y"]))
+
+        if not game_paused:
+            # CHECK COLLISIE MET SPELER
+            HITBOX_OFFSET = 50
+            if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > player_x and
+                monster["x"] + HITBOX_OFFSET < player_x + PLAYER_WIDTH and
+                monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
+                monster["y"] + HITBOX_OFFSET < player_y + PLAYER_HEIGHT):
+                print(f"Monster pakt speler!")
+
+            # CHECK COLLISIE MET WAPEN
+            if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > weapon_x and
+                monster["x"] + HITBOX_OFFSET < weapon_x + WEAPON_WIDTH and
+                monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > weapon_y and
+                monster["y"] + HITBOX_OFFSET < weapon_y + WEAPON_HEIGHT):
+                print(f"Monster je you ded buddy! GG")
+                # Bounce monster away
+                dx = monster["x"] - weapon_x
+                dy = monster["y"] - weapon_y
                 distance = math.hypot(dx, dy)
                 if distance != 0:
                     dx /= distance
                     dy /= distance
-                    monster["x"] -= dx * monster["speed"]
-                    monster["y"] -= dy * monster["speed"]
- 
-    elapsed_ms = pygame.time.get_ticks() - start_ticks
-    elapsed_sec = elapsed_ms // 1000  
-   
-    remaining_time = max(0, 10 - elapsed_sec)
-   
+                    monster["x"] += dx * bounce_strength
+                    monster["y"] += dy * bounce_strength
+
+    # TIMER TONEN
     timer_text = font.render(f'Time left: {remaining_time}s', True, (255, 255, 255))
     screen.blit(timer_text, (50, 50)) 
-    
-    if remaining_time == 0:
-        print("Time's up!")
-        pygame.time.sleep(10)
 
-    
-    # VERVERS SCHERM
     pygame.display.flip()
     fps_clock.tick(FPS)
 
 print('mygame stopt running')
-            
