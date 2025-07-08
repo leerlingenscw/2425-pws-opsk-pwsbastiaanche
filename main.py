@@ -17,6 +17,7 @@ WEAPON_WIDTH = 100
 WEAPON_HEIGHT = 150
 weapon_angle = 0  # initial angle in degrees
 weapon_radius = 100  # distance from player to weapon center
+bounce_strength = 200
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
@@ -100,16 +101,6 @@ while running:
     rotated_weapon_img = pygame.transform.rotate(weapon_img, -weapon_angle)
     rotated_rect = rotated_weapon_img.get_rect(center=(weapon_x + WEAPON_WIDTH / 2, weapon_y + WEAPON_HEIGHT / 2))
     
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_a]:
-        weapon_x -= weapon_speed_x
-    if keys[pygame.K_d]:
-        weapon_x += weapon_speed_x
-    if keys[pygame.K_w]:
-        weapon_y -= weapon_speed_y
-    if keys[pygame.K_s]:
-        weapon_y += weapon_speed_y
-
     # SPELER BINNEN SCHERM HOUDEN
     player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
     player_y = max(42, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
@@ -146,10 +137,17 @@ while running:
             monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > weapon_y and
             monster["y"] + HITBOX_OFFSET < weapon_y + WEAPON_HEIGHT):
             print(f"Monster {i} je you ded buddy! GG")
-            monster["speed"] = 0
-            monster["speed"] = 0
-            monster["x"] = 0
-            monster['y'] = 0
+   # Bounce monster away from the weapon
+            dx = monster["x"] - weapon_x
+            dy = monster["y"] - weapon_y
+            distance = math.hypot(dx, dy)
+
+            if distance != 0:
+                dx /= distance
+                dy /= distance
+
+                monster["x"] += dx * bounce_strength
+                monster["y"] += dy * bounce_strength
     # BOTST MONSTERS MET ELKAAR?
     for i, monster in enumerate(monsters):
         for j, other in enumerate(monsters):
@@ -180,7 +178,8 @@ while running:
     
     if remaining_time == 0:
         print("Time's up!")
-        pygame.time.wait(1000)
+        pygame.time.sleep(10)
+
     
     # VERVERS SCHERM
     pygame.display.flip()
