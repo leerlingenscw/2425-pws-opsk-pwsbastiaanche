@@ -179,6 +179,9 @@ while running:
                 monster["x"] + HITBOX_OFFSET < player_x + PLAYER_WIDTH and
                 monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
                 monster["y"] + HITBOX_OFFSET < player_y + PLAYER_HEIGHT):
+                for monster in monsters:
+                    monster["x"] += 100
+                    monster["y"] += 100
                 print(f"Monster pakt speler!")
                 if lives > 0:
                     lives -= 1
@@ -202,7 +205,11 @@ while running:
     screen.blit(timer_text, (270, 10)) 
     wave_text = font.render(f'Wave: {wave}', True, (255, 255, 255))
     screen.blit(wave_text, (550, 10))
-   
+    if game_paused:
+        pause_text = font.render('Druk op "Z" om naar de volgende wave te gaan!', True, (255, 255, 255))
+        text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 5 ))
+        pygame.draw.rect(screen, (0,0,0), text_rect.inflate(20, 20))
+        screen.blit(pause_text, text_rect)
     # HARTJES TEKENEN
     for i in range(lives):
         screen.blit(heart_img, (39 + i * (HEART_WIDTH + 10), 5))
