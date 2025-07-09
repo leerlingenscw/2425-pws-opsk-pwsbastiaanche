@@ -15,9 +15,13 @@ MONSTER_HEIGHT = 100
 MONSTER_COUNT = 5
 WEAPON_WIDTH = 100
 WEAPON_HEIGHT = 150
+HEART_WIDTH = 50
+HEART_HEIGHT = 50
 weapon_angle = 0  # initial angle in degrees
 weapon_radius = 100  # distance from player to weapon center
 bounce_strength = 200
+lives = 3
+wave = 1
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
@@ -33,7 +37,7 @@ weapon_speed_y = 10
 
 # INIT PYGAME
 pygame.init()
-font = pygame.font.SysFont('default', 64)
+font = pygame.font.SysFont('default', 50)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 fps_clock = pygame.time.Clock()
 
@@ -41,6 +45,7 @@ fps_clock = pygame.time.Clock()
 spritesheet = pygame.image.load('Player.png').convert_alpha()
 spritesheet1 = pygame.image.load("monster.png").convert_alpha()
 spritesheet2 = pygame.image.load("legendary_sword.png").convert_alpha()
+spritesheet3 = pygame.image.load('heart.png').convert_alpha()
 
 # SPELER AFBEELDING
 player_img = pygame.Surface((60, 90), pygame.SRCALPHA)
@@ -57,6 +62,12 @@ weapon_img = pygame.Surface((60, 90), pygame.SRCALPHA)
 weapon_img.blit(spritesheet2, (0, 0), (0, 0, 1111, 1100))
 weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
 
+# HEART AFBEELDING
+heart_img = pygame.Surface((100, 100), pygame.SRCALPHA)
+heart_img.blit(spritesheet3, (0, 0), (0, 0, 100, 100))
+heart_img = pygame.transform.scale(heart_img, (HEART_WIDTH, HEART_HEIGHT))
+
+
 # MEERDERE MONSTERS AANMAKEN
 monsters = []
 for i in range(MONSTER_COUNT):
@@ -66,7 +77,7 @@ for i in range(MONSTER_COUNT):
         "speed": 3
     })
 
-background_img = pygame.image.load("pixilart-drawing (1).png").convert()
+background_img = pygame.image.load("image.png").convert()
 background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 print('mygame is running')
@@ -90,7 +101,7 @@ while running:
     if remaining_time == 0 and not game_paused:
         print("Time's up!")
         game_paused = True
-        background_img = pygame.image.load("pixilart-drawing (1).png").convert()
+        background_img = pygame.image.load("image.png").convert()
         background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     if down_time == 0 and game_paused:
@@ -103,7 +114,8 @@ while running:
     if keys[pygame.K_z] and game_paused:
         start_ticks = pygame.time.get_ticks()
         game_paused = False
-        background_img = pygame.image.load("pixilart-drawing (1).png").convert()
+        wave += 1
+        background_img = pygame.image.load("image.png").convert()
         background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     if not game_paused:
@@ -168,6 +180,9 @@ while running:
                 monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
                 monster["y"] + HITBOX_OFFSET < player_y + PLAYER_HEIGHT):
                 print(f"Monster pakt speler!")
+                if lives > 0:
+                    lives -= 1
+                    pygame.time.delay(500)
 
             if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > weapon_x and
                 monster["x"] + HITBOX_OFFSET < weapon_x + WEAPON_WIDTH and
@@ -184,9 +199,16 @@ while running:
                     monster["y"] += dy * bounce_strength
 
     timer_text = font.render(f'Time left: {remaining_time}s', True, (255, 255, 255))
-    screen.blit(timer_text, (50, 50)) 
+    screen.blit(timer_text, (270, 10)) 
+    wave_text = font.render(f'Wave: {wave}', True, (255, 255, 255))
+    screen.blit(wave_text, (550, 10))
+   
+    # HARTJES TEKENEN
+    for i in range(lives):
+        screen.blit(heart_img, (39 + i * (HEART_WIDTH + 10), 5))
 
     pygame.display.flip()
     fps_clock.tick(FPS)
+
 
 print('mygame stopt running')
