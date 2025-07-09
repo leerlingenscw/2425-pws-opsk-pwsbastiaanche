@@ -23,6 +23,7 @@ bounce_strength = 200
 lives = 3
 wave = 1
 
+
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
 player_y = SCREEN_HEIGHT - 100
