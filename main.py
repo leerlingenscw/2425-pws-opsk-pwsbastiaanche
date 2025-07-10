@@ -138,6 +138,7 @@ while running:
         weapon_y = player_y + PLAYER_HEIGHT / 3.5 + weapon_radius * math.sin(math.radians(weapon_angle)) - WEAPON_HEIGHT / 2
         rotated_weapon_img = pygame.transform.rotate(weapon_img, -weapon_angle)
         rotated_rect = rotated_weapon_img.get_rect(center=(weapon_x + WEAPON_WIDTH / 2, weapon_y + WEAPON_HEIGHT / 2))
+        weapon_mask = pygame.mask.from_surface(rotated_weapon_img)
 
         player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
         player_y = max(60, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
@@ -194,19 +195,25 @@ while running:
                     lives -= 1
                     pygame.time.delay(500)
 
-            if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > weapon_x and
-                monster["x"] + HITBOX_OFFSET < weapon_x + WEAPON_WIDTH and
-                monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > weapon_y and
-                monster["y"] + HITBOX_OFFSET < weapon_y + WEAPON_HEIGHT):
-                print(f"Monster je you ded buddy! GG")
-                dx = monster["x"] - weapon_x
-                dy = monster["y"] - weapon_y
-                distance = math.hypot(dx, dy)
-                if distance != 0:
-                    dx /= distance
-                    dy /= distance
-                    monster["x"] += dx * bounce_strength
-                    monster["y"] += dy * bounce_strength
+            # Maak een masker aan van het monsteroppervlak
+            monster_surface = pygame.Surface((MONSTER_WIDTH, MONSTER_HEIGHT), pygame.SRCALPHA)
+            monster_surface.blit(Monster_img, (0, 0))
+            monster_mask = pygame.mask.from_surface(monster_surface)
+
+            # Positieverschil tussen zwaard en monster
+            offset_x = int(monster["x"] - rotated_rect.left)
+            offset_y = int(monster["y"] - rotated_rect.top)
+
+            if weapon_mask.overlap(monster_mask, (offset_x, offset_y)):
+             print("Monster geraakt door zwaard!")
+             dx = monster["x"] - weapon_x
+             dy = monster["y"] - weapon_y
+             distance = math.hypot(dx, dy)
+             if distance != 0:
+                 dx /= distance
+                 dy /= distance
+                 monster["x"] += dx * bounce_strength
+                 monster["y"] += dy * bounce_strength
 
     timer_text = font.render(f'Time left: {remaining_time}s', True, (255, 255, 255))
     screen.blit(timer_text, (270, 10)) 
