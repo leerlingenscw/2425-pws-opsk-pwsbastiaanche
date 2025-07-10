@@ -75,7 +75,7 @@ for i in range(MONSTER_COUNT):
     monsters.append({
         "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
         "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
-        "speed": 3
+        "speed": 5
     })
 
 background_img = pygame.image.load("image.png").convert()
@@ -85,6 +85,7 @@ print('mygame is running')
 
 start_ticks = pygame.time.get_ticks() 
 game_paused = False
+game_over = False
 
 running = True
 while running:
@@ -93,8 +94,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    elapsed_ms = pygame.time.get_ticks() - start_ticks
-    elapsed_sec = elapsed_ms // 1000  
+    if not game_over:
+      elapsed_ms = pygame.time.get_ticks() - start_ticks
+      elapsed_sec = elapsed_ms // 1000
+      remaining_time = max(0, 10 - elapsed_sec) 
 
     remaining_time = max(0, 10 - elapsed_sec)
     down_time = max(0, 300000000000000 - elapsed_sec)
@@ -119,7 +122,7 @@ while running:
         background_img = pygame.image.load("image.png").convert()
         background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-    if not game_paused:
+    if not game_paused and not game_over:
         if keys[pygame.K_a]:
             player_x -= player_speed_x
         if keys[pygame.K_d]:
@@ -137,7 +140,10 @@ while running:
         rotated_rect = rotated_weapon_img.get_rect(center=(weapon_x + WEAPON_WIDTH / 2, weapon_y + WEAPON_HEIGHT / 2))
 
         player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
-        player_y = max(42, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
+        player_y = max(60, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
+
+        weapon_x = max(0, min(weapon_x, SCREEN_WIDTH - PLAYER_WIDTH))
+        weapon_y = max(60, min(weapon_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
 
         for i, monster in enumerate(monsters):
             dx = player_x - monster["x"]
@@ -174,8 +180,8 @@ while running:
     for monster in monsters:
         screen.blit(Monster_img, (monster["x"], monster["y"]))
 
-        if not game_paused:
-            HITBOX_OFFSET = 50
+        if not game_paused and not game_over:
+            HITBOX_OFFSET = 72
             if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > player_x and
                 monster["x"] + HITBOX_OFFSET < player_x + PLAYER_WIDTH and
                 monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
@@ -211,6 +217,16 @@ while running:
         text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 5 ))
         pygame.draw.rect(screen, (0,0,0), text_rect.inflate(20, 20))
         screen.blit(pause_text, text_rect)
+
+    if lives <= 0:
+       game_over = True
+        
+    if game_over:
+     game_text = font.render("GAME OVER", True, (255, 255, 255))
+     text_rect = game_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200))
+     pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))
+     screen.blit(game_text, text_rect)
+
     # HARTJES TEKENEN
     for i in range(lives):
         screen.blit(heart_img, (39 + i * (HEART_WIDTH + 10), 5))
