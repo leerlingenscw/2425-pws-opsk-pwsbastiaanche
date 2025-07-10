@@ -17,6 +17,8 @@ WEAPON_WIDTH = 100
 WEAPON_HEIGHT = 150
 HEART_WIDTH = 50
 HEART_HEIGHT = 50
+COIN_WIDTH = 40
+COIN_HEIGHT = 40
 weapon_angle = 0  # initial angle in degrees
 weapon_radius = 100  # distance from player to weapon center
 bounce_strength = 200
@@ -47,6 +49,7 @@ spritesheet = pygame.image.load('Player.png').convert_alpha()
 spritesheet1 = pygame.image.load("monster.png").convert_alpha()
 spritesheet2 = pygame.image.load("legendary_sword.png").convert_alpha()
 spritesheet3 = pygame.image.load('heart.png').convert_alpha()
+spritesheet4 = pygame.image.load('coin.png').convert_alpha()
 
 # SPELER AFBEELDING
 player_img = pygame.Surface((60, 90), pygame.SRCALPHA)
@@ -68,6 +71,10 @@ heart_img = pygame.Surface((100, 100), pygame.SRCALPHA)
 heart_img.blit(spritesheet3, (0, 0), (0, 0, 100, 100))
 heart_img = pygame.transform.scale(heart_img, (HEART_WIDTH, HEART_HEIGHT))
 
+# COINS AFBEELDING
+coin_img = pygame.Surface((40, 40), pygame.SRCALPHA)
+coin_img.blit(spritesheet4, (0, 0), (0, 0, 40, 40))
+coin_img = pygame.transform.scale(coin_img, (COIN_WIDTH, COIN_HEIGHT))
 
 # MEERDERE MONSTERS AANMAKEN
 monsters = []
@@ -213,6 +220,7 @@ while running:
     screen.blit(background_img, (0, 0))
     screen.blit(player_img, (player_x, player_y))
     screen.blit(rotated_weapon_img, rotated_rect.topleft)
+    screen.blit(coin_img, (950, 10))
 
     for monster in monsters:
         screen.blit(Monster_img, (monster["x"], monster["y"]))
