@@ -25,6 +25,7 @@ bounce_strength = 200
 lives = 3
 wave = 1
 coins = 0
+score = 0 
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
@@ -252,6 +253,7 @@ while running:
             if weapon_mask.overlap(monster_mask, (offset_x, offset_y)):
              print("Monster geraakt door zwaard!")
              coins += 1
+             score += 10
              dx = monster["x"] - weapon_x
              dy = monster["y"] - weapon_y
              distance = math.hypot(dx, dy)
@@ -267,6 +269,8 @@ while running:
     screen.blit(wave_text, (550, 10))
     coin_text = font.render(f'Coins: {coins}', True, (255, 255, 255))
     screen.blit(coin_text, (800, 10))
+    score_text = font.render(f'Score: {score}', True, (255, 255, 255))
+    screen.blit(score_text, (1080, 10))
     if game_paused:
         pause_text = font.render('Druk op "Z" om naar de volgende wave te gaan!', True, (255, 255, 255))
         text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 5 ))
@@ -275,7 +279,10 @@ while running:
 
     if lives <= 0:
        game_over = True
-        
+    
+    if score == 50:
+        lives += 1
+
     if game_over:
      game_text = font.render("GAME OVER", True, (255, 255, 255))
      text_rect = game_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200))
