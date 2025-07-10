@@ -148,7 +148,7 @@ while running:
     if remaining_time == 0 and not game_paused:
         print("Time's up!")
         game_paused = True
-        background_img = pygame.image.load("image.png").convert()
+        background_img = pygame.image.load("shop.png").convert()
         background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     if down_time == 0 and game_paused:
@@ -185,9 +185,10 @@ while running:
 
         player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
         player_y = max(60, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
-
-        weapon_x = max(0, min(weapon_x, SCREEN_WIDTH - PLAYER_WIDTH))
-        weapon_y = max(60, min(weapon_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
+        monster["x"] = max(0, min(monster["x"], SCREEN_WIDTH - MONSTER_WIDTH))
+        monster["y"] = max(60, min(monster["y"], SCREEN_HEIGHT - MONSTER_HEIGHT))
+        weapon_x = max(0, min(weapon_x, SCREEN_WIDTH - WEAPON_WIDTH))
+        weapon_y = max(60, min(weapon_y, SCREEN_HEIGHT - WEAPON_HEIGHT))
 
         for i, monster in enumerate(monsters):
             dx = player_x - monster["x"]
@@ -220,7 +221,7 @@ while running:
     screen.blit(background_img, (0, 0))
     screen.blit(player_img, (player_x, player_y))
     screen.blit(rotated_weapon_img, rotated_rect.topleft)
-    screen.blit(coin_img, (950, 10))
+    screen.blit(coin_img, (960, 10))
 
     for monster in monsters:
         screen.blit(Monster_img, (monster["x"], monster["y"]))
