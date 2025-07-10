@@ -86,6 +86,8 @@ print('mygame is running')
 start_ticks = pygame.time.get_ticks() 
 game_paused = False
 game_over = False
+countdown_active = True
+countdown_start_ticks = pygame.time.get_ticks()
 
 running = True
 while running:
@@ -93,6 +95,40 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    # COUNTDOWN AAN HET BEGIN
+    if countdown_active:
+        current_ticks = pygame.time.get_ticks()
+        elapsed_time = (current_ticks - countdown_start_ticks) // 1000
+
+        if elapsed_time < 4:
+            if elapsed_time == 0:
+                countdown_text = "3"
+            elif elapsed_time == 1:
+                countdown_text = "2"
+            elif elapsed_time == 2:
+                countdown_text = "1"
+            elif elapsed_time == 3:
+                countdown_text = "GO!"
+
+            screen.blit(background_img, (0, 0))
+            screen.blit(player_img, (player_x, player_y))
+            for monster in monsters:
+                screen.blit(Monster_img, (monster["x"], monster["y"]))
+
+            text_surface = font.render(countdown_text, True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(40, 20))
+            screen.blit(text_surface, text_rect)
+
+            pygame.display.flip()
+            fps_clock.tick(FPS)
+            continue  # Skip rest van de game logic tijdens countdown
+
+        else:
+            countdown_active = False
+            start_ticks = pygame.time.get_ticks()  # Game timer resetten na countdown
+
 
     if not game_over:
       elapsed_ms = pygame.time.get_ticks() - start_ticks
