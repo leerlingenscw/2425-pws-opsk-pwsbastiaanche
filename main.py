@@ -24,9 +24,10 @@ weapon_radius = 100  # distance from player to weapon center
 bounce_strength = 200
 lives = 3
 wave = 1
-coins = 0
+coins = 1000000
 score = 0 
 buyteller = 1
+wave_delay = 0
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
@@ -53,7 +54,7 @@ spritesheet2 = pygame.image.load("weapon2.png").convert_alpha()
 spritesheet3 = pygame.image.load('heart.png').convert_alpha()
 spritesheet4 = pygame.image.load('coin.png').convert_alpha()
 spritesheet5 = pygame.image.load("legendary_sword.png").convert_alpha()
-
+spritesheet6 = pygame.image.load("HAMMER.png").convert_alpha()
 # SPELER AFBEELDING
 player_img = pygame.Surface((60, 90), pygame.SRCALPHA)
 player_img.blit(spritesheet, (0, 0), (0, 0, 1111, 1100))
@@ -322,11 +323,21 @@ while running:
     if keys[pygame.K_z] and game_paused and coins >= 5 and lives < 3:
         lives += 1
         coins -= 5
-    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller >= 1:
+    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller == 1 and wave_delay == 0:
         WEAPON_HEIGHT += 150
         WEAPON_WIDTH += 150
         weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
         weapon_img.blit(spritesheet5, (0, 0), (0, 0, 1111, 1100))
+        weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+        coins -= 10
+        buyteller -= 1
+        if wave +1:
+            wave_delay += 1
+    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller == 0 and wave_delay == 1:
+        WEAPON_HEIGHT += 150
+        WEAPON_WIDTH += 150
+        weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+        weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
         weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
         coins -= 10
         buyteller -= 1
