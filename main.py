@@ -83,7 +83,7 @@ for i in range(MONSTER_COUNT):
     monsters.append({
         "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
         "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
-        "speed": 5
+        "speed": 4
     })
 
 background_img = pygame.image.load("image.png").convert()
@@ -162,7 +162,7 @@ while running:
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_z] and game_paused:
+    if keys[pygame.K_q] and game_paused:
         start_ticks = pygame.time.get_ticks()
         game_paused = False
         wave += 1
@@ -258,12 +258,12 @@ while running:
                 monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
                 monster["y"] + HITBOX_OFFSET < player_y + PLAYER_HEIGHT):
                 for monster in monsters:
-                    monster["x"] += 100
-                    monster["y"] += 100
+                    monster["x"] += 300
+                    monster["y"] += 300
                 print(f"Monster pakt speler!")
                 if lives > 0:
                     lives -= 1
-                    pygame.time.delay(500)
+
 
             # Maak een masker aan van het monsteroppervlak
             monster_surface = pygame.Surface((MONSTER_WIDTH, MONSTER_HEIGHT), pygame.SRCALPHA)
@@ -289,10 +289,35 @@ while running:
 
    
     if game_paused:
-        pause_text = font.render('Druk op "Z" om naar de volgende wave te gaan!', True, (255, 255, 255))
-        text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 5 ))
+        big_font = pygame.font.SysFont('default', 140)
+        mid_font = pygame.font.SysFont('default', 55)
+        pause_text = font.render('Druk op "Q" om naar de volgende wave te gaan!', True, (255, 255, 255))
+        text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.2 ))
         pygame.draw.rect(screen, (0,0,0), text_rect.inflate(20, 20))
         screen.blit(pause_text, text_rect)
+        price_text = big_font.render('5', True, (0, 0, 0))
+        text_rect = price_text.get_rect(topleft=(295, 450))
+        screen.blit(price_text, text_rect)
+        price_text1 = big_font.render('10', True, (0, 0, 0))
+        text_rect = price_text1.get_rect(topleft=(540, 440))
+        screen.blit(price_text1, text_rect)
+        price_text2 = big_font.render('20', True, (0, 0, 0))
+        text_rect = price_text2.get_rect(topleft=(835, 445))
+        screen.blit(price_text2, text_rect)
+        press_text = mid_font.render('Press Z', True, (0, 0, 0))
+        text_rect = press_text.get_rect(topleft=(258, 50))
+        screen.blit(press_text, text_rect)
+        press_text1 = mid_font.render('Press X', True, (0, 0, 0))
+        text_rect = press_text1.get_rect(topleft=(518, 50))
+        screen.blit(press_text1, text_rect)
+        press_text2 = mid_font.render('Press C', True, (0, 0, 0))
+        text_rect = press_text2.get_rect(topleft=(818, 50))
+        screen.blit(press_text2, text_rect)
+
+    if keys[pygame.K_z] and game_paused and coins >= 5:
+        lives += 1
+        coins -= 5
+
 
     if lives <= 0:
        game_over = True
