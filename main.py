@@ -13,8 +13,8 @@ PLAYER_HEIGHT = 150
 MONSTER_WIDTH = 100
 MONSTER_HEIGHT = 100
 MONSTER_COUNT = 5
-WEAPON_WIDTH = 100
-WEAPON_HEIGHT = 150
+WEAPON_WIDTH = 70
+WEAPON_HEIGHT = 120
 HEART_WIDTH = 50
 HEART_HEIGHT = 50
 COIN_WIDTH = 40
@@ -26,6 +26,7 @@ lives = 3
 wave = 1
 coins = 0
 score = 0 
+buyteller = 1
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
@@ -48,9 +49,10 @@ fps_clock = pygame.time.Clock()
 # LAAD SPRITESHEET
 spritesheet = pygame.image.load('Player.png').convert_alpha()
 spritesheet1 = pygame.image.load("monster.png").convert_alpha()
-spritesheet2 = pygame.image.load("legendary_sword.png").convert_alpha()
+spritesheet2 = pygame.image.load("weapon2.png").convert_alpha()
 spritesheet3 = pygame.image.load('heart.png').convert_alpha()
 spritesheet4 = pygame.image.load('coin.png').convert_alpha()
+spritesheet5 = pygame.image.load("legendary_sword.png").convert_alpha()
 
 # SPELER AFBEELDING
 player_img = pygame.Surface((60, 90), pygame.SRCALPHA)
@@ -63,8 +65,8 @@ monster_img.blit(spritesheet1, (0, 0), (0, 0, 50, 50))
 Monster_img = pygame.transform.scale(monster_img, (MONSTER_WIDTH, MONSTER_HEIGHT))
 
 # ZWAARD AFBEELDING
-weapon_img = pygame.Surface((60, 90), pygame.SRCALPHA)
-weapon_img.blit(spritesheet2, (0, 0), (0, 0, 1111, 1100))
+weapon_img = pygame.Surface((70, 130), pygame.SRCALPHA)
+weapon_img.blit(spritesheet2, (0, 0), (0, 0, 100, 150))
 weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
 
 # HEART AFBEELDING
@@ -121,6 +123,7 @@ while running:
 
             screen.blit(background_img, (0, 0))
             screen.blit(player_img, (player_x, player_y))
+            screen.blit(weapon_img, (weapon_x, weapon_y))
             for monster in monsters:
                screen.blit(Monster_img, (monster["x"], monster["y"]))
 
@@ -168,6 +171,8 @@ while running:
         wave += 1
         background_img = pygame.image.load("image.png").convert()
         background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        countdown_active = True
+        countdown_start_ticks = pygame.time.get_ticks()
 
     if not game_paused and not game_over:
         if keys[pygame.K_a]:
@@ -314,9 +319,17 @@ while running:
         text_rect = press_text2.get_rect(topleft=(818, 50))
         screen.blit(press_text2, text_rect)
 
-    if keys[pygame.K_z] and game_paused and coins >= 5:
+    if keys[pygame.K_z] and game_paused and coins >= 5 and lives < 3:
         lives += 1
         coins -= 5
+    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller >= 1:
+        WEAPON_HEIGHT += 150
+        WEAPON_WIDTH += 150
+        weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+        weapon_img.blit(spritesheet5, (0, 0), (0, 0, 1111, 1100))
+        weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+        coins -= 10
+        buyteller -= 1
 
 
     if lives <= 0:
@@ -331,6 +344,7 @@ while running:
         if keys[pygame.K_r]:
             # Reset variabelen
             lives = 3
+            buyteller = 1
             wave = 1
             coins = 0
             score = 0
