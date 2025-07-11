@@ -108,7 +108,7 @@ while running:
     if countdown_active:
         current_ticks = pygame.time.get_ticks()
         elapsed_time = (current_ticks - countdown_start_ticks) // 1000
-
+        
         if elapsed_time < 4:
             if elapsed_time == 0:
                 countdown_text = "3"
@@ -122,7 +122,8 @@ while running:
             screen.blit(background_img, (0, 0))
             screen.blit(player_img, (player_x, player_y))
             for monster in monsters:
-                screen.blit(Monster_img, (monster["x"], monster["y"]))
+               screen.blit(Monster_img, (monster["x"], monster["y"]))
+
 
             text_surface = font.render(countdown_text, True, (255, 255, 255))
             text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
@@ -151,6 +152,8 @@ while running:
         game_paused = True
         background_img = pygame.image.load("shop.png").convert()
         background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
 
     if down_time == 0 and game_paused:
         print("Down time is over")
@@ -186,10 +189,9 @@ while running:
 
         player_x = max(0, min(player_x, SCREEN_WIDTH - PLAYER_WIDTH))
         player_y = max(60, min(player_y, SCREEN_HEIGHT - PLAYER_HEIGHT))
-        monster["x"] = max(0, min(monster["x"], SCREEN_WIDTH - MONSTER_WIDTH))
-        monster["y"] = max(60, min(monster["y"], SCREEN_HEIGHT - MONSTER_HEIGHT))
-        weapon_x = max(0, min(weapon_x, SCREEN_WIDTH - WEAPON_WIDTH))
-        weapon_y = max(60, min(weapon_y, SCREEN_HEIGHT - WEAPON_HEIGHT))
+        for monster in monsters:
+         monster["x"] = max(0, min(monster["x"], SCREEN_WIDTH - MONSTER_WIDTH))
+         monster["y"] = max(60, min(monster["y"], SCREEN_HEIGHT - MONSTER_HEIGHT))
 
         for i, monster in enumerate(monsters):
             dx = player_x - monster["x"]
@@ -219,14 +221,36 @@ while running:
                         monster["x"] -= dx * monster["speed"]
                         monster["y"] -= dy * monster["speed"]
 
+    # Altijd de achtergrond tonen (game of shop)
     screen.blit(background_img, (0, 0))
-    screen.blit(player_img, (player_x, player_y))
-    screen.blit(rotated_weapon_img, rotated_rect.topleft)
+
+    if not game_paused:
+      screen.blit(player_img, (player_x, player_y))
+      screen.blit(rotated_weapon_img, rotated_rect.topleft)
+
+    # Coins-icoon
     screen.blit(coin_img, (960, 10))
 
-    for monster in monsters:
+    # Monsters tekenen
+    if not game_paused:
+     for monster in monsters:
         screen.blit(Monster_img, (monster["x"], monster["y"]))
 
+    # HUD
+    timer_text = font.render(f'Time left: {remaining_time}s', True, (255, 255, 255))
+    screen.blit(timer_text, (270, 10)) 
+    wave_text = font.render(f'Wave: {wave}', True, (255, 255, 255))
+    screen.blit(wave_text, (550, 10))
+    coin_text = font.render(f'Coins: {coins}', True, (255, 255, 255))
+    screen.blit(coin_text, (800, 10))
+    score_text = font.render(f'Score: {score}', True, (255, 255, 255))
+    screen.blit(score_text, (1080, 10))
+
+    # Hartjes
+    for i in range(lives):
+        screen.blit(heart_img, (39 + i * (HEART_WIDTH + 10), 5))
+
+    for monster in monsters:
         if not game_paused and not game_over:
             HITBOX_OFFSET = 72
             if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > player_x and
@@ -263,14 +287,7 @@ while running:
                  monster["x"] += dx * bounce_strength
                  monster["y"] += dy * bounce_strength
 
-    timer_text = font.render(f'Time left: {remaining_time}s', True, (255, 255, 255))
-    screen.blit(timer_text, (270, 10)) 
-    wave_text = font.render(f'Wave: {wave}', True, (255, 255, 255))
-    screen.blit(wave_text, (550, 10))
-    coin_text = font.render(f'Coins: {coins}', True, (255, 255, 255))
-    screen.blit(coin_text, (800, 10))
-    score_text = font.render(f'Score: {score}', True, (255, 255, 255))
-    screen.blit(score_text, (1080, 10))
+   
     if game_paused:
         pause_text = font.render('Druk op "Z" om naar de volgende wave te gaan!', True, (255, 255, 255))
         text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 5 ))
@@ -280,19 +297,35 @@ while running:
     if lives <= 0:
        game_over = True
     
-    if score == 50:
-        lives += 1
-
     if game_over:
-     game_text = font.render("GAME OVER", True, (255, 255, 255))
-     text_rect = game_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200))
-     pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))
-     screen.blit(game_text, text_rect)
+        game_text = font.render("GAME OVER - Druk op 'R' om opnieuw te starten", True, (255, 255, 255))
+        text_rect = game_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200))
+        pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))
+        screen.blit(game_text, text_rect)
 
-    # HARTJES TEKENEN
-    for i in range(lives):
-        screen.blit(heart_img, (39 + i * (HEART_WIDTH + 10), 5))
-
+        if keys[pygame.K_r]:
+            # Reset variabelen
+            lives = 3
+            wave = 1
+            coins = 0
+            score = 0
+            player_x = SCREEN_WIDTH / 2
+            player_y = SCREEN_HEIGHT - 100
+            weapon_angle = 0
+            countdown_active = True
+            countdown_start_ticks = pygame.time.get_ticks()
+            background_img = pygame.image.load("image.png").convert()
+            background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            monsters = []
+            for i in range(MONSTER_COUNT):
+                monsters.append({
+                    "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
+                    "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
+                    "speed": 5
+                })
+            game_paused = False
+            game_over = False
+ 
     pygame.display.flip()
     fps_clock.tick(FPS)
 
