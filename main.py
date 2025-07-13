@@ -24,10 +24,12 @@ weapon_radius = 100  # distance from player to weapon center
 bounce_strength = 200
 lives = 3
 wave = 1
-coins = 1000000
+coins = 0
 score = 0 
 buyteller = 1
 wave_delay = 0
+last_purchase_time = 0
+purchase_cooldown = 200
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
@@ -320,10 +322,13 @@ while running:
         text_rect = press_text2.get_rect(topleft=(818, 50))
         screen.blit(press_text2, text_rect)
 
-    if keys[pygame.K_z] and game_paused and coins >= 5 and lives < 3:
-        lives += 1
-        coins -= 5
-    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller == 1 and wave_delay == 0:
+    current_time = pygame.time.get_ticks()
+    if keys[pygame.K_z] and game_paused and coins >= 5 and lives < 3 and current_time - last_purchase_time > purchase_cooldown:
+     lives += 1
+     coins -= 5
+     last_purchase_time = current_time
+ 
+    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller == 1 and wave_delay == 0 and current_time - last_purchase_time > purchase_cooldown:
         WEAPON_HEIGHT += 150
         WEAPON_WIDTH += 150
         weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
@@ -331,17 +336,18 @@ while running:
         weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
         coins -= 10
         buyteller -= 1
-        if wave +1:
-            wave_delay += 1
-    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller == 0 and wave_delay == 1:
-        WEAPON_HEIGHT += 150
-        WEAPON_WIDTH += 150
+        wave_delay += 1
+        last_purchase_time = current_time
+
+    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller == 0 and wave_delay == 1 and current_time - last_purchase_time > purchase_cooldown:
+        WEAPON_WIDTH -= 150
+        WEAPON_HEIGHT -= 150
         weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
         weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
         weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
         coins -= 10
         buyteller -= 1
-
+        last_purchase_time = current_time
 
     if lives <= 0:
        game_over = True
@@ -356,12 +362,18 @@ while running:
             # Reset variabelen
             lives = 3
             buyteller = 1
+            wave_delay = 0
             wave = 1
             coins = 0
             score = 0
             player_x = SCREEN_WIDTH / 2
             player_y = SCREEN_HEIGHT - 100
             weapon_angle = 0
+            WEAPON_WIDTH = 100
+            WEAPON_HEIGHT = 150
+            weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+            weapon_img.blit(spritesheet2, (0, 0), (0, 0, 100, 150))
+            weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
             countdown_active = True
             countdown_start_ticks = pygame.time.get_ticks()
             background_img = pygame.image.load("image.png").convert()
