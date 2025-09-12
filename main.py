@@ -12,7 +12,7 @@ PLAYER_WIDTH = 120
 PLAYER_HEIGHT = 150
 MONSTER_WIDTH = 100
 MONSTER_HEIGHT = 100
-MONSTER_COUNT = 5
+MONSTER_COUNT = 0
 WEAPON_WIDTH = 70
 WEAPON_HEIGHT = 120
 HEART_WIDTH = 50
@@ -30,6 +30,18 @@ buyteller = 1
 wave_delay = 0
 last_purchase_time = 0
 purchase_cooldown = 200
+in_menu = True
+
+# --- Functie om monsters te maken ---
+def spawn_monsters(count):
+    monsters = []
+    for i in range(count):
+        monsters.append({
+            "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
+            "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
+            "speed": 4
+        })
+    return monsters
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
@@ -108,12 +120,64 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+          if in_menu:  # alleen klikken als je in menu bent
+            if easy_rect.collidepoint(pygame.mouse.get_pos()):
+                MONSTER_COUNT = 3
+                monsters = spawn_monsters(MONSTER_COUNT)
+                in_menu = False
+                countdown_active = True
+                countdown_start_ticks = pygame.time.get_ticks()
 
-    # COUNTDOWN AAN HET BEGIN
+            elif medium_rect.collidepoint(pygame.mouse.get_pos()):
+                MONSTER_COUNT = 5
+                monsters = spawn_monsters(MONSTER_COUNT)
+                in_menu = False
+                countdown_active = True
+                countdown_start_ticks = pygame.time.get_ticks()
+
+            elif hard_rect.collidepoint(pygame.mouse.get_pos()):
+                MONSTER_COUNT = 7
+                monsters = spawn_monsters(MONSTER_COUNT)
+                in_menu = False
+                countdown_active = True
+                countdown_start_ticks = pygame.time.get_ticks()
+
+    keys = pygame.key.get_pressed()
+
+    # ---------------- MENU SCHERM ----------------
+    if in_menu:
+        screen.fill((0, 0, 0))  # zwarte achtergrond
+        easy_text = font.render("Easy (3 monsters)", True, (255, 255, 255))
+        medium_text = font.render("Medium (5 monsters)", True, (255, 255, 255))
+        hard_text = font.render("Hard (7 monsters)", True, (255, 255, 255))
+
+      # Rectangles (klikgebieden)
+        easy_rect = easy_text.get_rect(center=(SCREEN_WIDTH//2, 300))
+        medium_rect = medium_text.get_rect(center=(SCREEN_WIDTH//2, 400))
+        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//2, 500))
+   
+        mouse_pos = pygame.mouse.get_pos()
+
+        if easy_rect.collidepoint(mouse_pos):
+          easy_text = font.render("Easy (3 monsters)", True, (0, 255, 0))  # Groen hover
+        if medium_rect.collidepoint(mouse_pos):
+          medium_text = font.render("Medium (5 monsters)", True, (255, 255, 0))  # Geel hover
+        if hard_rect.collidepoint(mouse_pos):
+          hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))  # Rood hover
+
+        screen.blit(easy_text, easy_rect)
+        screen.blit(medium_text, medium_rect)
+        screen.blit(hard_text, hard_rect)
+
+        pygame.display.flip()
+        continue  # << stop de loop hier, ga NIET door naar game
+
+    # ---------------- COUNTDOWN ----------------
     if countdown_active:
         current_ticks = pygame.time.get_ticks()
         elapsed_time = (current_ticks - countdown_start_ticks) // 1000
-        
+
         if elapsed_time < 4:
             if elapsed_time == 0:
                 countdown_text = "3"
@@ -128,9 +192,9 @@ while running:
             screen.blit(player_img, (player_x, player_y))
             screen.blit(weapon_img, (weapon_x, weapon_y))
             for monster in monsters:
-               screen.blit(Monster_img, (monster["x"], monster["y"]))
+                screen.blit(Monster_img, (monster["x"], monster["y"]))
 
-
+            # Tekst in het midden
             text_surface = font.render(countdown_text, True, (255, 255, 255))
             text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
             pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(40, 20))
@@ -138,8 +202,7 @@ while running:
 
             pygame.display.flip()
             fps_clock.tick(FPS)
-            continue  # Skip rest van de game logic tijdens countdown
-
+            continue  # << stop hier, wacht tot countdown voorbij is
         else:
             countdown_active = False
             start_ticks = pygame.time.get_ticks()  # Game timer resetten na countdown
@@ -387,6 +450,7 @@ while running:
                 })
             game_paused = False
             game_over = False
+            in_menu = True
  
     pygame.display.flip()
     fps_clock.tick(FPS)
