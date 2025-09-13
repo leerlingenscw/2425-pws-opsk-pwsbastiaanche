@@ -74,7 +74,7 @@ intro_title = "Wanted in Greece!"
 intro_texts = [
     "Welcome to our fantastic game! We would like to welcome you to Wanted\nin Greece! This game is about you! A Greek hero who is on his way to his\nnext mission. All of the sudden you hear something in the bushes, you look\nbehind the bushes and all of the sudden you see a monster!\nYou have been ambushed!\n\n\n\nPress Enter to continue ",
     "You will be able to choose your character in a second, but first let's\ntalk about the controls. You can use W, to move up, A to go left,\nS to go down and D to go right. You will have 3 hearts, everytime you touch a\nmonster you will lose a heart. You also have a weapon that\ncirkels around you. If your weapon touches a monster you will get 10 points\nand 1 coin. With the coins you will be able to buy hearts, other weapons and\nmore weapons in the shop between waves.\nIf you have a score of 250 you win!\nPress Enter to continue ",
-    "We have made 3 levels for you: Easy, Medium and Hard. You need to beat\nthe easier level before you can play the other one. At Level Hard\nyou will have a different kind of monster that is faster so watch out! I hope you\nenjoy the game we do.\nlet's get right into choosing our character!\n\n\nPress Enter to continue"
+    "We have made 3 levels for you: Easy, Medium and Hard. You need to beat\nthe easier level before you can play the other one. At Level Hard\nyou will have a different kind of monster that is faster so watch out! I hope\nyou enjoy the game we do.\nlet's get right into choosing our character!\n\n\nPress Enter to continue"
 ]
 
 current_text_index = 0
@@ -83,6 +83,23 @@ char_index = 0
 typing_speed = 50  # ms per letter
 last_update = pygame.time.get_ticks()
 waiting_for_enter = False
+
+
+# KARAKTER KEUZE
+in_character_select = False   # Staat voor karakterkeuze scherm
+selected_character_img = None
+character_images = [
+    pygame.image.load("Player.png").convert_alpha(),
+    pygame.image.load("player2.png").convert_alpha(),
+    pygame.image.load("player3.png").convert_alpha(),
+    pygame.image.load("player4.png").convert_alpha(),
+    pygame.image.load("sanic.png").convert_alpha()
+]
+# Schaal alle characters naar dezelfde grootte als de speler
+for i in range(len(character_images)):
+    character_images[i] = pygame.transform.scale(character_images[i], (PLAYER_WIDTH, PLAYER_HEIGHT))
+
+character_rects = []  # hier komen de klikgebieden van de characters
 
 # LAAD SPRITESHEET
 spritesheet = pygame.image.load('Player.png').convert_alpha()
@@ -139,9 +156,17 @@ countdown_start_ticks = pygame.time.get_ticks()
 
 running = True
 while running:
+    # ---------------- EVENTS ----------------
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+            if in_character_select and event.type == pygame.MOUSEBUTTONDOWN:
+                 for i, rect in enumerate(character_rects):
+                     if rect.collidepoint(event.pos):
+                       selected_character_img = character_images[i]
+                       player_img = selected_character_img  # Gekozen character wordt speler
+                       in_character_select = False
+                       in_menu = True  # daarna naar levelkeuze/menu
+            if event.type == pygame.QUIT:
+                running = False
 
     keys = pygame.key.get_pressed()
 
@@ -166,20 +191,20 @@ while running:
                     waiting_for_enter = True
 
         # Tekst tekenen (meerdere regels mogelijk)
-        lines = displayed_text.split("\n")  # splits op enters
+        lines = displayed_text.split("\n")
         y_offset = 0
         for line in lines:
             text_surface = intro_text_font.render(line, True, (0, 0, 0))
             text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + y_offset - 190))
             screen.blit(text_surface, text_rect)
-            y_offset += 50  
+            y_offset += 50
 
-        # ENTER → volgende tekst of naar menu
+        # ENTER → volgende tekst of naar karakterkeuze
         if keys[pygame.K_RETURN] and waiting_for_enter:
             current_text_index += 1
             if current_text_index >= len(intro_texts):
                 in_intro = False
-                in_menu = True
+                in_character_select = True  # << GA NAAR KARAKTERKEUZE
             else:
                 displayed_text = ""
                 char_index = 0
@@ -187,32 +212,93 @@ while running:
 
         pygame.display.flip()
         fps_clock.tick(FPS)
-        continue   # << hier stoppen, niet verder naar menu/game
-        
-    if event.type == pygame.QUIT:
-            running = False
-    elif event.type == pygame.MOUSEBUTTONDOWN:
-          if in_menu:  # alleen klikken als je in menu bent
-            if easy_rect.collidepoint(pygame.mouse.get_pos()):
+        continue   # stop hier, ga niet verder naar menu/game
+
+  # ---------------- KARAKTER SELECTIE ----------------
+    if in_character_select:
+        screen.fill((0, 0, 0))  # zwarte achtergrond
+        title_text = font.render("Choose a Character by clicking on it!", True, (255, 255, 255))
+        title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
+        screen.blit(title_text, title_rect)
+
+        # Plaats characters horizontaal
+        character_rects = []
+        spacing = 50
+        start_x = (SCREEN_WIDTH - (PLAYER_WIDTH * len(character_images) + spacing * (len(character_images)-1))) // 2
+        y_pos = SCREEN_HEIGHT // 2
+        for i, img in enumerate(character_images):
+            x_pos = start_x + i * (PLAYER_WIDTH + spacing)
+            rect = pygame.Rect(x_pos, y_pos, PLAYER_WIDTH, PLAYER_HEIGHT)
+            character_rects.append(rect)
+            screen.blit(img, (x_pos, y_pos))
+
+        # Hover effect: gele rand
+        mouse_pos = pygame.mouse.get_pos()
+        for i, rect in enumerate(character_rects):
+            if rect.collidepoint(mouse_pos):
+                pygame.draw.rect(screen, (255, 255, 0), rect, 4)
+
+        pygame.display.flip()
+        fps_clock.tick(FPS)
+        continue  # stop hier, ga niet verder naar menu/game
+
+    # ---------------- MENU SCHERM ----------------
+    if in_menu:
+        screen.fill((0, 0, 0))  # zwarte achtergrond
+        title_text = font.render("Choose a Level by clicking on it!", True, (255, 255, 255))
+        easy_text = font.render("Easy (3 monsters)", True, (255, 255, 255))
+        medium_text = font.render("Medium (5 monsters)", True, (255, 255, 255))
+        hard_text = font.render("Hard (7 monsters)", True, (255, 255, 255))
+
+        # Rectangles (klikgebieden)
+        easy_rect = easy_text.get_rect(center=(SCREEN_WIDTH//2, 300))
+        medium_rect = medium_text.get_rect(center=(SCREEN_WIDTH//2, 400))
+        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//2, 500))
+
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Hover effect
+        if easy_rect.collidepoint(mouse_pos):
+            easy_text = font.render("Easy (3 monsters)", True, (0, 255, 0))
+        if medium_rect.collidepoint(mouse_pos):
+            medium_text = font.render("Medium (5 monsters)", True, (255, 255, 0))
+        if hard_rect.collidepoint(mouse_pos):
+            hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))
+
+        # Klikken checken
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if easy_rect.collidepoint(mouse_pos):
                 MONSTER_COUNT = 3
                 monsters = spawn_monsters(MONSTER_COUNT)
                 in_menu = False
                 countdown_active = True
                 countdown_start_ticks = pygame.time.get_ticks()
 
-            elif medium_rect.collidepoint(pygame.mouse.get_pos()):
+            elif medium_rect.collidepoint(mouse_pos):
                 MONSTER_COUNT = 5
                 monsters = spawn_monsters(MONSTER_COUNT)
                 in_menu = False
                 countdown_active = True
                 countdown_start_ticks = pygame.time.get_ticks()
 
-            elif hard_rect.collidepoint(pygame.mouse.get_pos()):
+            elif hard_rect.collidepoint(mouse_pos):
                 MONSTER_COUNT = 7
                 monsters = spawn_monsters(MONSTER_COUNT)
                 in_menu = False
                 countdown_active = True
                 countdown_start_ticks = pygame.time.get_ticks()
+
+        # Teksten tekenen
+        screen.blit(title_text, (400, 150))
+        screen.blit(easy_text, easy_rect)
+        screen.blit(medium_text, medium_rect)
+        screen.blit(hard_text, hard_rect)
+
+        pygame.display.flip()
+        continue  # << stop de loop hier, ga NIET door naar game
+        
+    if event.type == pygame.QUIT:
+            running = False
 
     keys = pygame.key.get_pressed()
 
