@@ -83,6 +83,8 @@ char_index = 0
 typing_speed = 50  # ms per letter
 last_update = pygame.time.get_ticks()
 waiting_for_enter = False
+enter_cooldown = 0
+ENTER_COOLDOWN_TIME = 300  # milliseconden (0.3s), pas aan naar smaak
 
 
 # KARAKTER KEUZE
@@ -124,6 +126,10 @@ weapon_img = pygame.Surface((70, 130), pygame.SRCALPHA)
 weapon_img.blit(spritesheet2, (0, 0), (0, 0, 100, 150))
 weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
 
+#keuze menu achtergrond
+menu_background = pygame.image.load("keuzemenu.png").convert()
+menu_background = pygame.transform.scale(menu_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 # HEART AFBEELDING
 heart_img = pygame.Surface((100, 100), pygame.SRCALPHA)
 heart_img.blit(spritesheet3, (0, 0), (0, 0, 100, 100))
@@ -155,20 +161,26 @@ countdown_active = True
 countdown_start_ticks = pygame.time.get_ticks()
 
 running = True
+enter_cooldown = 200  # cooldown in ms voor Enter
+
 while running:
     # ---------------- EVENTS ----------------
     for event in pygame.event.get():
-            if in_character_select and event.type == pygame.MOUSEBUTTONDOWN:
-                 for i, rect in enumerate(character_rects):
-                     if rect.collidepoint(event.pos):
-                       selected_character_img = character_images[i]
-                       player_img = selected_character_img  # Gekozen character wordt speler
-                       in_character_select = False
-                       in_menu = True  # daarna naar levelkeuze/menu
-            if event.type == pygame.QUIT:
-                running = False
+        if event.type == pygame.QUIT:
+            running = False
+        if in_character_select and event.type == pygame.MOUSEBUTTONDOWN:
+            for i, rect in enumerate(character_rects):
+                if rect.collidepoint(event.pos):
+                    selected_character_img = character_images[i]
+                    player_img = selected_character_img
+                    in_character_select = False
+                    in_menu = True
 
     keys = pygame.key.get_pressed()
+
+    # ---------------- ENTER COOLDOWN ----------------
+    if enter_cooldown > 0:
+        enter_cooldown -= fps_clock.get_time()
 
     # ---------------- INTRO ----------------
     if in_intro:
@@ -199,27 +211,35 @@ while running:
             screen.blit(text_surface, text_rect)
             y_offset += 50
 
-        # ENTER → volgende tekst of naar karakterkeuze
-        if keys[pygame.K_RETURN] and waiting_for_enter:
-            current_text_index += 1
-            if current_text_index >= len(intro_texts):
-                in_intro = False
-                in_character_select = True  # << GA NAAR KARAKTERKEUZE
+        # ENTER → alles tonen of naar volgende tekst
+        if keys[pygame.K_RETURN] and enter_cooldown <= 0:
+            enter_cooldown = 200  # reset cooldown
+            if not waiting_for_enter:
+                # toon direct alle tekst
+                displayed_text = intro_texts[current_text_index]
+                waiting_for_enter = True
             else:
-                displayed_text = ""
-                char_index = 0
-                waiting_for_enter = False
+                # ga naar volgende tekst
+                current_text_index += 1
+                if current_text_index >= len(intro_texts):
+                    in_intro = False
+                    in_character_select = True
+                else:
+                    displayed_text = ""
+                    char_index = 0
+                    waiting_for_enter = False
 
         pygame.display.flip()
         fps_clock.tick(FPS)
-        continue   # stop hier, ga niet verder naar menu/game
+        continue  # stop hier, ga niet verder naar menu/game
 
   # ---------------- KARAKTER SELECTIE ----------------
     if in_character_select:
-        screen.fill((0, 0, 0))  # zwarte achtergrond
-        title_text = font.render("Choose a Character by clicking on it!", True, (255, 255, 255))
-        title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
-        screen.blit(title_text, title_rect)
+        if in_menu:
+         screen.blit(menu_background, (0, 0))
+         title_text = font.render("Choose a Character by clicking on it!", True, (255, 255, 255))
+         title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
+         screen.blit(title_text, title_rect)
 
         # Plaats characters horizontaal
         character_rects = []
