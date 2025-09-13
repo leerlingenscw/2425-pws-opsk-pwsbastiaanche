@@ -61,6 +61,29 @@ font = pygame.font.SysFont('default', 50)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 fps_clock = pygame.time.Clock()
 
+# ---- INTRO SCHERM VARIABELEN ----
+in_intro = True
+intro_background = pygame.image.load("beginscherm1.png").convert()
+intro_background = pygame.transform.scale(intro_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+intro_title_font = pygame.font.SysFont("default", 80)
+intro_text_font = pygame.font.SysFont("default", 40)
+
+intro_title = "Wanted in Greece!"
+
+intro_texts = [
+    "Welcome to our fantastic game! We would like to welcome you to Wanted\nin Greece! This game is about you! A Greek hero who is on his way to his\nnext mission. All of the sudden you hear something in the bushes, you look\nbehind the bushes and all of the sudden you see a monster!\nYou have been ambushed!\n\n\n\nPress Enter to continue ",
+    "You will be able to choose your character in a seconnd, but first let's\ntalk about the controls. You can use W, to move up, A to go left,\nS to go down and D to go right. You will have 3 hearts, everytime you touch a\nmonster you will lose a heart. You also have a weapon that\ncirkels around you. If your weapon touches a monster you will get 10 points\nand 1 coin. With the coins you will be able to buy heart, other weapons and\nmore weapons in the shop between waves.\nIf you have a score of 250 you win!\nPress Enter to continue ",
+    "We have made 3 levels for you: Easy, Medium and Hard. You need to beat\nthe easier level before you can play the other one. At Level Hard\nyou will have a different kind of monster tht is fast so watch out!I hope you\nenjoy the game we do.\nlet's get right into choosing our character!\n\n\nPress Enter to continue"
+]
+
+current_text_index = 0
+displayed_text = ""
+char_index = 0
+typing_speed = 50  # ms per letter
+last_update = pygame.time.get_ticks()
+waiting_for_enter = False
+
 # LAAD SPRITESHEET
 spritesheet = pygame.image.load('Player.png').convert_alpha()
 spritesheet1 = pygame.image.load("monster.png").convert_alpha()
@@ -116,11 +139,59 @@ countdown_start_ticks = pygame.time.get_ticks()
 
 running = True
 while running:
-    # EVENTS
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+
+    keys = pygame.key.get_pressed()
+
+    # ---------------- INTRO ----------------
+    if in_intro:
+        screen.blit(intro_background, (0, 0))
+
+        # Titel tekenen
+        title_surface = intro_title_font.render(intro_title, True, (0, 0, 0))
+        title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 100))
+        screen.blit(title_surface, title_rect)
+
+        # Typewriter effect
+        if not waiting_for_enter:
+            now = pygame.time.get_ticks()
+            if now - last_update > typing_speed:
+                if char_index < len(intro_texts[current_text_index]):
+                    displayed_text += intro_texts[current_text_index][char_index]
+                    char_index += 1
+                    last_update = now
+                else:
+                    waiting_for_enter = True
+
+        # Tekst tekenen (meerdere regels mogelijk)
+        lines = displayed_text.split("\n")  # splits op enters
+        y_offset = 0
+        for line in lines:
+            text_surface = intro_text_font.render(line, True, (0, 0, 0))
+            text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + y_offset - 190))
+            screen.blit(text_surface, text_rect)
+            y_offset += 50  
+
+        # ENTER → volgende tekst of naar menu
+        if keys[pygame.K_RETURN] and waiting_for_enter:
+            current_text_index += 1
+            if current_text_index >= len(intro_texts):
+                in_intro = False
+                in_menu = True
+            else:
+                displayed_text = ""
+                char_index = 0
+                waiting_for_enter = False
+
+        pygame.display.flip()
+        fps_clock.tick(FPS)
+        continue   # << hier stoppen, niet verder naar menu/game
+        
+    if event.type == pygame.QUIT:
+            running = False
+    elif event.type == pygame.MOUSEBUTTONDOWN:
           if in_menu:  # alleen klikken als je in menu bent
             if easy_rect.collidepoint(pygame.mouse.get_pos()):
                 MONSTER_COUNT = 3
@@ -148,6 +219,7 @@ while running:
     # ---------------- MENU SCHERM ----------------
     if in_menu:
         screen.fill((0, 0, 0))  # zwarte achtergrond
+        title_text = font.render("Choose a Level by clicking on it!", True, (255, 255, 255))
         easy_text = font.render("Easy (3 monsters)", True, (255, 255, 255))
         medium_text = font.render("Medium (5 monsters)", True, (255, 255, 255))
         hard_text = font.render("Hard (7 monsters)", True, (255, 255, 255))
@@ -166,6 +238,7 @@ while running:
         if hard_rect.collidepoint(mouse_pos):
           hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))  # Rood hover
 
+        screen.blit(title_text, (400, 150))
         screen.blit(easy_text, easy_rect)
         screen.blit(medium_text, medium_rect)
         screen.blit(hard_text, hard_rect)
