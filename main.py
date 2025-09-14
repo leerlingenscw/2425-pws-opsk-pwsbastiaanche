@@ -25,7 +25,7 @@ bounce_strength = 200
 lives = 3
 wave = 1
 coins = 0
-score = 0 
+score = 490 
 buyteller = 1
 wave_delay = 0
 last_purchase_time = 0
@@ -142,6 +142,10 @@ heart_img = pygame.transform.scale(heart_img, (HEART_WIDTH, HEART_HEIGHT))
 coin_img = pygame.Surface((40, 40), pygame.SRCALPHA)
 coin_img.blit(spritesheet4, (0, 0), (0, 0, 40, 40))
 coin_img = pygame.transform.scale(coin_img, (COIN_WIDTH, COIN_HEIGHT))
+# lock afbeelding
+lock_img = pygame.image.load("Lock.png").convert_alpha()
+lock_img = pygame.transform.scale(lock_img, (100, 100))  # adjust size to fit nicely
+
 
 # MEERDERE MONSTERS AANMAKEN
 monsters = []
@@ -294,6 +298,9 @@ while running:
                 medium_text = font.render("Medium (5 monsters)", True, (255, 255, 0))
         else:
             medium_text = font.render("Medium (LOCKED)", True, (128, 128, 128))
+            lock_pos = medium_rect.center
+            lock_rect = lock_img.get_rect(center=lock_pos)
+            screen.blit(lock_img, lock_rect)
 
         # Hard only if unlocked
         if hard_unlocked:
@@ -301,6 +308,9 @@ while running:
                 hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))
         else:
             hard_text = font.render("Hard (LOCKED)", True, (128, 128, 128))
+            lock_pos = hard_rect.center
+            lock_rect = lock_img.get_rect(center=lock_pos)
+            screen.blit(lock_img, lock_rect)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if easy_rect.collidepoint(mouse_pos):
