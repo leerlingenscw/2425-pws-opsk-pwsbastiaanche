@@ -130,6 +130,9 @@ weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
 menu_background = pygame.image.load("keuzemenu.png").convert()
 menu_background = pygame.transform.scale(menu_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+difficulty = pygame.image.load("difficulty.png").convert()
+difficulty = pygame.transform.scale(difficulty, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 # HEART AFBEELDING
 heart_img = pygame.Surface((100, 100), pygame.SRCALPHA)
 heart_img.blit(spritesheet3, (0, 0), (0, 0, 100, 100))
@@ -264,16 +267,16 @@ while running:
 
     # ---------------- MENU SCHERM ----------------
     if in_menu:
-        screen.fill((0, 0, 0))  # zwarte achtergrond
+        screen.blit(difficulty, (0,0))
         title_text = font.render("Choose a Level by clicking on it!", True, (255, 255, 255))
         easy_text = font.render("Easy (3 monsters)", True, (255, 255, 255))
         medium_text = font.render("Medium (5 monsters)", True, (255, 255, 255))
         hard_text = font.render("Hard (7 monsters)", True, (255, 255, 255))
 
         # Rectangles (klikgebieden)
-        easy_rect = easy_text.get_rect(center=(SCREEN_WIDTH//2, 300))
+        easy_rect = easy_text.get_rect(center=(SCREEN_WIDTH//5, 400))
         medium_rect = medium_text.get_rect(center=(SCREEN_WIDTH//2, 400))
-        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//2, 500))
+        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//1.2, 400))
 
         mouse_pos = pygame.mouse.get_pos()
 
@@ -314,27 +317,6 @@ while running:
         screen.blit(medium_text, medium_rect)
         screen.blit(hard_text, hard_rect)
 
-        pygame.display.flip()
-        continue  # << stop de loop hier, ga NIET door naar game
-        
-    if event.type == pygame.QUIT:
-            running = False
-
-    keys = pygame.key.get_pressed()
-
-    # ---------------- MENU SCHERM ----------------
-    if in_menu:
-        screen.fill((0, 0, 0))  # zwarte achtergrond
-        title_text = font.render("Choose a Level by clicking on it!", True, (255, 255, 255))
-        easy_text = font.render("Easy (3 monsters)", True, (255, 255, 255))
-        medium_text = font.render("Medium (5 monsters)", True, (255, 255, 255))
-        hard_text = font.render("Hard (7 monsters)", True, (255, 255, 255))
-
-      # Rectangles (klikgebieden)
-        easy_rect = easy_text.get_rect(center=(SCREEN_WIDTH//2, 300))
-        medium_rect = medium_text.get_rect(center=(SCREEN_WIDTH//2, 400))
-        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//2, 500))
-   
         mouse_pos = pygame.mouse.get_pos()
 
         if easy_rect.collidepoint(mouse_pos):
