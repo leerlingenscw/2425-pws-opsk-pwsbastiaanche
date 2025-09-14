@@ -288,14 +288,14 @@ while running:
         if easy_rect.collidepoint(mouse_pos):
             easy_text = font.render("Easy (3 monsters)", True, (0, 255, 0))
 
-# Medium only if unlocked
+        # Medium only if unlocked
         if medium_unlocked:
             if medium_rect.collidepoint(mouse_pos):
                 medium_text = font.render("Medium (5 monsters)", True, (255, 255, 0))
         else:
             medium_text = font.render("Medium (LOCKED)", True, (128, 128, 128))
-
-# Hard only if unlocked
+            
+        # Hard only if unlocked
         if hard_unlocked:
             if hard_rect.collidepoint(mouse_pos):
                 hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))
