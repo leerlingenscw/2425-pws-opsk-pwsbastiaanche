@@ -294,7 +294,7 @@ while running:
                 medium_text = font.render("Medium (5 monsters)", True, (255, 255, 0))
         else:
             medium_text = font.render("Medium (LOCKED)", True, (128, 128, 128))
-            
+
         # Hard only if unlocked
         if hard_unlocked:
             if hard_rect.collidepoint(mouse_pos):
@@ -538,14 +538,6 @@ while running:
             if score >= 500 and not game_won:
                 game_won = True
                 game_paused = True
-
-    # Unlock the next difficulty
-            if MONSTER_COUNT == 3:   # Easy beaten
-                medium_unlocked = True
-            elif MONSTER_COUNT == 5: # Medium beaten
-                hard_unlocked = True
-
-
    
     if game_paused and not game_won:
         big_font = pygame.font.SysFont('default', 140)
@@ -641,6 +633,12 @@ while running:
             in_menu = True
 
     if game_won:
+    # Unlock next difficulty only on win
+        if MONSTER_COUNT == 3:   # Easy beaten
+            medium_unlocked = True
+        elif MONSTER_COUNT == 5: # Medium beaten
+            hard_unlocked = True
+
         win_text = font.render("YOU WIN! - Press 'R' to restart", True, (255, 255, 0))
         text_rect = win_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))
