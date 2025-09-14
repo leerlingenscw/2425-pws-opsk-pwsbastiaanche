@@ -25,7 +25,7 @@ bounce_strength = 200
 lives = 3
 wave = 1
 coins = 0
-score = 0 
+score = 490 
 buyteller = 1
 wave_delay = 0
 last_purchase_time = 0
@@ -145,6 +145,7 @@ coin_img = pygame.transform.scale(coin_img, (COIN_WIDTH, COIN_HEIGHT))
 # lock afbeelding
 lock_img = pygame.image.load("Lock.png").convert_alpha()
 lock_img = pygame.transform.scale(lock_img, (100, 100))  # adjust size to fit nicely
+
 
 
 # MEERDERE MONSTERS AANMAKEN
@@ -326,16 +327,26 @@ while running:
                 in_menu = False
                 countdown_active = True
                 countdown_start_ticks = pygame.time.get_ticks()
+                score = 490
 
             elif hard_rect.collidepoint(mouse_pos) and hard_unlocked:
-                MONSTER_COUNT = 7
-                monsters = spawn_monsters(MONSTER_COUNT)
-                in_menu = False
-                countdown_active = True
-                countdown_start_ticks = pygame.time.get_ticks()
+                 MONSTER_COUNT = 7
+                 monsters = spawn_monsters(MONSTER_COUNT)
+
+                 # Laad hele monster2.png
+                 Monster_img = pygame.image.load("monster2.png").convert_alpha()
+                 Monster_img = pygame.transform.scale(Monster_img, (MONSTER_WIDTH, MONSTER_HEIGHT))
+
+                 # Geef monsters extra snelheid
+                 for monster in monsters:
+                      monster["speed"] += 1.5
+
+                 in_menu = False
+                 countdown_active = True
+                 countdown_start_ticks = pygame.time.get_ticks()
 
         # Teksten tekenen
-        screen.blit(title_text, (400, 600))
+        screen.blit(title_text, (400, 25))
         screen.blit(easy_text, easy_rect)
         screen.blit(medium_text, medium_rect)
         screen.blit(hard_text, hard_rect)
@@ -349,7 +360,6 @@ while running:
         if hard_rect.collidepoint(mouse_pos):
           hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))  # Rood hover
 
-        screen.blit(title_text, (400, 600))
         screen.blit(easy_text, easy_rect)
         screen.blit(medium_text, medium_rect)
         screen.blit(hard_text, hard_rect)
@@ -506,19 +516,20 @@ while running:
         screen.blit(heart_img, (39 + i * (HEART_WIDTH + 10), 5))
 
     for monster in monsters:
-        if not game_paused and not game_over:
-            HITBOX_OFFSET = 72
-            if (monster["x"] + MONSTER_WIDTH - HITBOX_OFFSET > player_x and
-                monster["x"] + HITBOX_OFFSET < player_x + PLAYER_WIDTH and
-                monster["y"] + MONSTER_HEIGHT - HITBOX_OFFSET > player_y and
-                monster["y"] + HITBOX_OFFSET < player_y + PLAYER_HEIGHT):
-                for monster in monsters:
-                    monster["x"] += 300
-                    monster["y"] += 300
-                print(f"Monster pakt speler!")
-                if lives > 0:
-                    lives -= 1
+    # Maak rects van speler en monster
+     player_rect = pygame.Rect(player_x, player_y, PLAYER_WIDTH, PLAYER_HEIGHT)
+     monster_rect = pygame.Rect(monster["x"], monster["y"], MONSTER_WIDTH, MONSTER_HEIGHT)
 
+    # Check of ze elkaar raken
+     if player_rect.colliderect(monster_rect):
+        # Duw monsters weg
+        for m in monsters:
+            m["x"] += 300
+            m["y"] += 300
+
+        print("Monster pakt speler!")
+        if lives > 0:
+            lives -= 1
 
             # Maak een masker aan van het monsteroppervlak
             monster_surface = pygame.Surface((MONSTER_WIDTH, MONSTER_HEIGHT), pygame.SRCALPHA)
