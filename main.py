@@ -161,6 +161,9 @@ start_ticks = pygame.time.get_ticks()
 game_paused = False
 game_over = False
 game_won = False
+easy_unlocked = True
+medium_unlocked = False
+hard_unlocked = False
 countdown_active = True
 countdown_start_ticks = pygame.time.get_ticks()
 
@@ -281,15 +284,24 @@ while running:
 
         mouse_pos = pygame.mouse.get_pos()
 
-        # Hover effect
+        # Easy is always available
         if easy_rect.collidepoint(mouse_pos):
             easy_text = font.render("Easy (3 monsters)", True, (0, 255, 0))
-        if medium_rect.collidepoint(mouse_pos):
-            medium_text = font.render("Medium (5 monsters)", True, (255, 255, 0))
-        if hard_rect.collidepoint(mouse_pos):
-            hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))
 
-        # Klikken checken
+# Medium only if unlocked
+        if medium_unlocked:
+            if medium_rect.collidepoint(mouse_pos):
+                medium_text = font.render("Medium (5 monsters)", True, (255, 255, 0))
+        else:
+            medium_text = font.render("Medium (LOCKED)", True, (128, 128, 128))
+
+# Hard only if unlocked
+        if hard_unlocked:
+            if hard_rect.collidepoint(mouse_pos):
+                hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))
+        else:
+            hard_text = font.render("Hard (LOCKED)", True, (128, 128, 128))
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             if easy_rect.collidepoint(mouse_pos):
                 MONSTER_COUNT = 3
@@ -298,14 +310,14 @@ while running:
                 countdown_active = True
                 countdown_start_ticks = pygame.time.get_ticks()
 
-            elif medium_rect.collidepoint(mouse_pos):
+            elif medium_rect.collidepoint(mouse_pos) and medium_unlocked:
                 MONSTER_COUNT = 5
                 monsters = spawn_monsters(MONSTER_COUNT)
                 in_menu = False
                 countdown_active = True
                 countdown_start_ticks = pygame.time.get_ticks()
 
-            elif hard_rect.collidepoint(mouse_pos):
+            elif hard_rect.collidepoint(mouse_pos) and hard_unlocked:
                 MONSTER_COUNT = 7
                 monsters = spawn_monsters(MONSTER_COUNT)
                 in_menu = False
@@ -522,6 +534,17 @@ while running:
             if score >= 500 and not game_won:
                 game_won = True
                 game_paused = True
+
+            if score >= 500 and not game_won:
+                game_won = True
+                game_paused = True
+
+    # Unlock the next difficulty
+            if MONSTER_COUNT == 3:   # Easy beaten
+                medium_unlocked = True
+            elif MONSTER_COUNT == 5: # Medium beaten
+                hard_unlocked = True
+
 
    
     if game_paused and not game_won:
