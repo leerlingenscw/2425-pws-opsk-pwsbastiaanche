@@ -276,7 +276,7 @@ while running:
         # Rectangles (klikgebieden)
         easy_rect = easy_text.get_rect(center=(SCREEN_WIDTH//5, 400))
         medium_rect = medium_text.get_rect(center=(SCREEN_WIDTH//2, 400))
-        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//1.2, 400))
+        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//1.29, 400))
 
         mouse_pos = pygame.mouse.get_pos()
 
@@ -312,7 +312,7 @@ while running:
                 countdown_start_ticks = pygame.time.get_ticks()
 
         # Teksten tekenen
-        screen.blit(title_text, (400, 150))
+        screen.blit(title_text, (400, 600))
         screen.blit(easy_text, easy_rect)
         screen.blit(medium_text, medium_rect)
         screen.blit(hard_text, hard_rect)
@@ -326,7 +326,7 @@ while running:
         if hard_rect.collidepoint(mouse_pos):
           hard_text = font.render("Hard (7 monsters)", True, (255, 0, 0))  # Rood hover
 
-        screen.blit(title_text, (400, 150))
+        screen.blit(title_text, (400, 600))
         screen.blit(easy_text, easy_rect)
         screen.blit(medium_text, medium_rect)
         screen.blit(hard_text, hard_rect)
