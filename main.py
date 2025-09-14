@@ -160,6 +160,7 @@ print('mygame is running')
 start_ticks = pygame.time.get_ticks() 
 game_paused = False
 game_over = False
+game_won = False
 countdown_active = True
 countdown_start_ticks = pygame.time.get_ticks()
 
@@ -392,7 +393,7 @@ while running:
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_q] and game_paused:
+    if keys[pygame.K_q] and game_paused and not game_won:
         start_ticks = pygame.time.get_ticks()
         game_paused = False
         wave += 1
@@ -518,9 +519,12 @@ while running:
                  dy /= distance
                  monster["x"] += dx * bounce_strength
                  monster["y"] += dy * bounce_strength
+            if score >= 500 and not game_won:
+                game_won = True
+                game_paused = True
 
    
-    if game_paused:
+    if game_paused and not game_won:
         big_font = pygame.font.SysFont('default', 140)
         mid_font = pygame.font.SysFont('default', 55)
         pause_text = font.render('Druk op "Q" om naar de volgende wave te gaan!', True, (255, 255, 255))
@@ -547,12 +551,12 @@ while running:
         screen.blit(press_text2, text_rect)
 
     current_time = pygame.time.get_ticks()
-    if keys[pygame.K_z] and game_paused and coins >= 5 and lives < 3 and current_time - last_purchase_time > purchase_cooldown:
+    if keys[pygame.K_z] and game_paused and not game_won and coins >= 5 and lives < 3 and current_time - last_purchase_time > purchase_cooldown:
      lives += 1
      coins -= 5
      last_purchase_time = current_time
  
-    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller == 1 and wave_delay == 0 and current_time - last_purchase_time > purchase_cooldown:
+    if keys[pygame.K_x] and game_paused and not game_won and coins >= 10 and buyteller == 1 and wave_delay == 0 and current_time - last_purchase_time > purchase_cooldown:
         WEAPON_HEIGHT += 150
         WEAPON_WIDTH += 150
         weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
@@ -563,7 +567,7 @@ while running:
         wave_delay += 1
         last_purchase_time = current_time
 
-    if keys[pygame.K_x] and game_paused and coins >= 10 and buyteller == 0 and wave_delay == 1 and current_time - last_purchase_time > purchase_cooldown:
+    if keys[pygame.K_x] and game_paused and not game_won and coins >= 10 and buyteller == 0 and wave_delay == 1 and current_time - last_purchase_time > purchase_cooldown:
         WEAPON_WIDTH -= 150
         WEAPON_HEIGHT -= 150
         weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
@@ -612,7 +616,45 @@ while running:
             game_paused = False
             game_over = False
             in_menu = True
- 
+
+    if game_won:
+        win_text = font.render("YOU WIN! - Press 'R' to restart", True, (255, 255, 0))
+        text_rect = win_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))
+        screen.blit(win_text, text_rect)
+
+        if keys[pygame.K_r]:
+        # Reset variables (same as game over reset)
+            lives = 3
+            buyteller = 1
+            wave_delay = 0
+            wave = 1
+            coins = 0
+            score = 0
+            player_x = SCREEN_WIDTH / 2
+            player_y = SCREEN_HEIGHT - 100
+            weapon_angle = 0
+            WEAPON_WIDTH = 100
+            WEAPON_HEIGHT = 150
+            weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+            weapon_img.blit(spritesheet2, (0, 0), (0, 0, 100, 150))
+            weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+            countdown_active = True
+            countdown_start_ticks = pygame.time.get_ticks()
+            background_img = pygame.image.load("image.png").convert()
+            background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            monsters = []
+            for i in range(MONSTER_COUNT):
+                monsters.append({
+                    "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
+                    "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
+                    "speed": 5
+                })
+            game_paused = False
+            game_over = False
+            game_won = False
+            in_menu = True
+
     pygame.display.flip()
     fps_clock.tick(FPS)
 
