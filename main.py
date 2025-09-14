@@ -25,7 +25,7 @@ bounce_strength = 200
 lives = 3
 wave = 1
 coins = 0
-score = 490 
+score = 0 
 buyteller = 1
 wave_delay = 0
 last_purchase_time = 0
@@ -73,7 +73,7 @@ intro_title = "Wanted in Greece!"
 
 intro_texts = [
     "Welcome to our fantastic game! We would like to welcome you to Wanted\nin Greece! This game is about you! A Greek hero who is on his way to his\nnext mission. All of the sudden you hear something in the bushes, you look\nbehind the bushes and all of the sudden you see a monster!\nYou have been ambushed!\n\n\n\nPress Enter to continue ",
-    "You will be able to choose your character in a second, but first let's\ntalk about the controls. You can use W, to move up, A to go left,\nS to go down and D to go right. You will have 3 hearts, everytime you touch a\nmonster you will lose a heart. You also have a weapon that\ncirkels around you. If your weapon touches a monster you will get 10 points\nand 1 coin. With the coins you will be able to buy hearts, other weapons and\nmore weapons in the shop between waves.\nIf you have a score of 250 you win!\nPress Enter to continue ",
+    "You will be able to choose your character in a second, but first let's\ntalk about the controls. You can use W, to move up, A to go left,\nS to go down and D to go right. You will have 3 hearts, everytime you touch a\nmonster you will lose a heart. You also have a weapon that\ncirkels around you. If your weapon touches a monster you will get 10 points\nand 1 coin. With the coins you will be able to buy hearts, other weapons and\nmore weapons in the shop between waves.\nIf you have a score of 500 you win!\nPress Enter to continue ",
     "We have made 3 levels for you: Easy, Medium and Hard. You need to beat\nthe easier level before you can play the other one. At Level Hard\nyou will have a different kind of monster that is faster so watch out! I hope\nyou enjoy the game we do.\nlet's get right into choosing our character!\n\n\nPress Enter to continue"
 ]
 
@@ -395,9 +395,9 @@ while running:
     if not game_over:
       elapsed_ms = pygame.time.get_ticks() - start_ticks
       elapsed_sec = elapsed_ms // 1000
-      remaining_time = max(0, 10 - elapsed_sec) 
+      remaining_time = max(0, 15 - elapsed_sec) 
 
-    remaining_time = max(0, 10 - elapsed_sec)
+    remaining_time = max(0, 15 - elapsed_sec)
     down_time = max(0, 300000000000000 - elapsed_sec)
 
     if remaining_time == 0 and not game_paused:
