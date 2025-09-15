@@ -72,9 +72,11 @@ intro_text_font = pygame.font.SysFont("default", 40)
 intro_title = "Wanted in Greece!"
 
 intro_texts = [
-    "Welcome to our fantastic game! We would like to welcome you to Wanted\nin Greece! This game is about you! A Greek hero who is on his way to his\nnext mission. All of the sudden you hear something in the bushes, you look\nbehind the bushes and all of the sudden you see a monster!\nYou have been ambushed!\n\n\n\nPress Enter to continue ",
-    "You will be able to choose your character in a second, but first let's\ntalk about the controls. You can use W, to move up, A to go left,\nS to go down and D to go right. You will have 3 hearts, everytime you touch a\nmonster you will lose a heart. You also have a weapon that\ncirkels around you. If your weapon touches a monster you will get 10 points\nand 1 coin. With the coins you will be able to buy hearts, other weapons and\nmore weapons in the shop between waves.\nIf you have a score of 500 you win!\nPress Enter to continue ",
-    "We have made 3 levels for you: Easy, Medium and Hard. You need to beat\nthe easier level before you can play the other one. At Level Hard\nyou will have a different kind of monster that is faster so watch out! I hope\nyou enjoy the game we do.\nlet's get right into choosing our character!\n\n\nPress Enter to continue"
+    "Welcome brave warrior!\nYou have been chosen by us, the greek gods, to elimenate a great threat.\nThere are dangerous monsters in these woods\nand you may be greeces final hope.\n\n\n\n\nPress Enter to continue ",
+    "Now great warrior you have to learn to control yourself.\nYou can use W, to move up, A to go left,\nS to go down and D to go right.\nYou will have 3 hearts, everytime you touch a\nmonster you shall lose a heart.\nThis might prove harder than it seems.\n\n\nPress Enter to continue",
+    "You also have a weapon that cirkels around you.\nThat might help you get rid of those foul creatures.\nIf you manage to hit a creature i will bless you with some\npainfully ordenairy ideal not transparant saphires.\nBut you may call them points.\nIf you have 500 points you win!\n\n\nPress Enter to continue",
+    "Monsters naturaly spawn coins when you hit them.\nSo save up and you may be able to buy some interesting stuff in the shop.\n\n\n\n\n\n\nPress Enter to continue ",
+    "We have selected multiple challenges for you to complete.\nYou need to prove your worthy by completing the easier raids\nto be able to do the harder ones.\n\n\n\n\n\nPress Enter to continue"
 ]
 
 current_text_index = 0
