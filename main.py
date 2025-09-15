@@ -13,8 +13,8 @@ PLAYER_HEIGHT = 150
 MONSTER_WIDTH = 100
 MONSTER_HEIGHT = 100
 MONSTER_COUNT = 0
-WEAPON_WIDTH = 70
-WEAPON_HEIGHT = 120
+WEAPON_WIDTH = 80
+WEAPON_HEIGHT = 140
 HEART_WIDTH = 50
 HEART_HEIGHT = 50
 COIN_WIDTH = 40
@@ -25,7 +25,7 @@ bounce_strength = 200
 lives = 3
 wave = 1
 coins = 0
-score = 490 
+score = 0
 buyteller = 1
 wave_delay = 0
 last_purchase_time = 0
@@ -329,7 +329,6 @@ while running:
                 in_menu = False
                 countdown_active = True
                 countdown_start_ticks = pygame.time.get_ticks()
-                score = 490
 
             elif hard_rect.collidepoint(mouse_pos) and hard_unlocked:
                  MONSTER_COUNT = 7
@@ -518,11 +517,39 @@ while running:
         screen.blit(heart_img, (39 + i * (HEART_WIDTH + 10), 5))
 
     for monster in monsters:
-    # Maak rects van speler en monster
-     player_rect = pygame.Rect(player_x, player_y, PLAYER_WIDTH, PLAYER_HEIGHT)
-     monster_rect = pygame.Rect(monster["x"], monster["y"], MONSTER_WIDTH, MONSTER_HEIGHT)
+    # ------------------------
+    # Kleiner hitbox voor speler en monster
+    # ------------------------
+     player_rect = pygame.Rect(
+        player_x + PLAYER_WIDTH * 0.1,
+        player_y + PLAYER_HEIGHT * 0.1,
+        PLAYER_WIDTH * 0.8,
+        PLAYER_HEIGHT * 0.8
+    )
 
-    # Check of ze elkaar raken
+     monster_rect = pygame.Rect(
+        monster["x"] + MONSTER_WIDTH * 0.15,
+        monster["y"] + MONSTER_HEIGHT * 0.15,
+        MONSTER_WIDTH * 0.7,
+        MONSTER_HEIGHT * 0.7
+    )
+
+    # ------------------------
+    # Weapon rect en mask
+    # ------------------------
+     weapon_rect = rotated_weapon_img.get_rect(center=(weapon_x + WEAPON_WIDTH / 2,
+                                                      weapon_y + WEAPON_HEIGHT / 2))
+
+    # Maskers
+     weapon_mask = pygame.mask.from_surface(rotated_weapon_img)
+
+     monster_surface = pygame.Surface((MONSTER_WIDTH, MONSTER_HEIGHT), pygame.SRCALPHA)
+     monster_surface.blit(Monster_img, (0, 0))
+     monster_mask = pygame.mask.from_surface(monster_surface)
+
+    # ------------------------
+    # Collision: speler ↔ monster
+    # ------------------------
      if player_rect.colliderect(monster_rect):
         # Duw monsters weg
         for m in monsters:
@@ -533,40 +560,69 @@ while running:
         if lives > 0:
             lives -= 1
 
-            # Maak een masker aan van het monsteroppervlak
-            monster_surface = pygame.Surface((MONSTER_WIDTH, MONSTER_HEIGHT), pygame.SRCALPHA)
-            monster_surface.blit(Monster_img, (0, 0))
-            monster_mask = pygame.mask.from_surface(monster_surface)
+    # ------------------------
+    # Collision: weapon ↔ monster
+    # ------------------------
+    # Bereken offset voor mask overlap
+     offset_x = monster_rect.left - weapon_rect.left
+     offset_y = monster_rect.top - weapon_rect.top
 
-            # Positieverschil tussen zwaard en monster
-            offset_x = int(monster["x"] - rotated_rect.left)
-            offset_y = int(monster["y"] - rotated_rect.top)
+     if weapon_mask.overlap(monster_mask, (offset_x, offset_y)):
+        print("Monster geraakt door zwaard!")
+        coins += 1
+        score += 10
 
-            if weapon_mask.overlap(monster_mask, (offset_x, offset_y)):
-             print("Monster geraakt door zwaard!")
-             coins += 1
-             score += 10
-             dx = monster["x"] - weapon_x
-             dy = monster["y"] - weapon_y
-             distance = math.hypot(dx, dy)
-             if distance != 0:
-                 dx /= distance
-                 dy /= distance
-                 monster["x"] += dx * bounce_strength
-                 monster["y"] += dy * bounce_strength
-            if score >= 500 and not game_won:
-                game_won = True
-                game_paused = True
+        # Bounce effect
+        dx = monster["x"] - weapon_x
+        dy = monster["y"] - weapon_y
+        distance = math.hypot(dx, dy)
+        if distance != 0:
+            dx /= distance
+            dy /= distance
+            monster["x"] += dx * bounce_strength
+            monster["y"] += dy * bounce_strength
 
-            if score >= 500 and not game_won:
-                game_won = True
-                game_paused = True
+    # ------------------------
+    # Winconditie
+    # ------------------------
+     if score >= 500 and not game_won:
+        game_won = True
+        game_paused = True
+
+        # Maak een masker aan van het monsteroppervlak
+        monster_surface = pygame.Surface((MONSTER_WIDTH, MONSTER_HEIGHT), pygame.SRCALPHA)
+        monster_surface.blit(Monster_img, (0, 0))
+        monster_mask = pygame.mask.from_surface(monster_surface)
+
+        # Positieverschil tussen wapen en monster
+        offset_x = int(monster["x"] - rotated_rect.left)
+        offset_y = int(monster["y"] - rotated_rect.top)
+
+        if weapon_mask.overlap(monster_mask, (offset_x, offset_y)):
+            print("Monster geraakt door zwaard!")
+            coins += 1
+            score += 10
+
+            # Bounce effect
+            dx = monster["x"] - weapon_x
+            dy = monster["y"] - weapon_y
+            distance = math.hypot(dx, dy)
+            if distance != 0:
+                dx /= distance
+                dy /= distance
+                monster["x"] += dx * bounce_strength
+                monster["y"] += dy * bounce_strength
+
+        if score >= 500 and not game_won:
+            game_won = True
+            game_paused = True
+
    
     if game_paused and not game_won:
         big_font = pygame.font.SysFont('default', 140)
         mid_font = pygame.font.SysFont('default', 55)
-        pause_text = font.render('Druk op "Q" om naar de volgende wave te gaan!', True, (255, 255, 255))
-        text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.2 ))
+        pause_text = font.render('Press Q to go to the next wave!', True, (255, 255, 255))
+        text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, 80))
         pygame.draw.rect(screen, (0,0,0), text_rect.inflate(20, 20))
         screen.blit(pause_text, text_rect)
         price_text = big_font.render('5', True, (0, 0, 0))
@@ -578,15 +634,78 @@ while running:
         price_text2 = big_font.render('20', True, (0, 0, 0))
         text_rect = price_text2.get_rect(topleft=(835, 445))
         screen.blit(price_text2, text_rect)
-        press_text = mid_font.render('Press Z', True, (0, 0, 0))
-        text_rect = press_text.get_rect(topleft=(258, 50))
-        screen.blit(press_text, text_rect)
-        press_text1 = mid_font.render('Press X', True, (0, 0, 0))
-        text_rect = press_text1.get_rect(topleft=(518, 50))
-        screen.blit(press_text1, text_rect)
-        press_text2 = mid_font.render('Press C', True, (0, 0, 0))
-        text_rect = press_text2.get_rect(topleft=(818, 50))
-        screen.blit(press_text2, text_rect)
+     
+       # Maak klikbare tekst (Click Here)
+        item1_text = mid_font.render("Click Here", True, (0, 0, 0))
+        item1_rect = item1_text.get_rect(topleft=(250, 550))
+        screen.blit(item1_text, item1_rect)
+
+        item2_text = mid_font.render("Click Here", True, (0, 0, 0))
+        item2_rect = item2_text.get_rect(topleft=(518, 550))
+        screen.blit(item2_text, item2_rect)
+
+        item3_text = mid_font.render("Click Here", True, (0, 0, 0))
+        item3_rect = item3_text.get_rect(topleft=(818, 550))
+        screen.blit(item3_text, item3_rect)
+
+        # Hover effect (Buy / Not enough coins)
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Item 1 (5 coins, extra hart)
+        if item1_rect.collidepoint(mouse_pos):
+         if coins >= 5 and lives < 3:
+            hover_text = mid_font.render("Buy", True, (0, 200, 0))
+         else:
+           hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
+         hover_rect = hover_text.get_rect(center=(item1_rect.centerx, item1_rect.bottom + 30))
+         screen.blit(hover_text, hover_rect)
+
+# Item 2 (10 coins, legendary sword)
+        if item2_rect.collidepoint(mouse_pos):
+         if coins >= 10 and buyteller == 1 and wave_delay == 0:
+           hover_text = mid_font.render("Buy", True, (0, 200, 0))
+         else:
+          hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
+         hover_rect = hover_text.get_rect(center=(item2_rect.centerx, item2_rect.bottom + 30))
+         screen.blit(hover_text, hover_rect)
+
+        # Item 3 (10 coins, hammer)
+        if item3_rect.collidepoint(mouse_pos):
+         if coins >= 10 and buyteller == 0 and wave_delay == 1:
+          hover_text = mid_font.render("Buy", True, (0, 200, 0))
+         else:
+             hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
+         hover_rect = hover_text.get_rect(center=(item3_rect.centerx, item3_rect.bottom + 30))
+         screen.blit(hover_text, hover_rect)
+
+        # Klik detectie
+        if event.type == pygame.MOUSEBUTTONDOWN:
+         if item1_rect.collidepoint(mouse_pos) and coins >= 5 and lives < 3:
+           lives += 1
+           coins -= 5
+           last_purchase_time = pygame.time.get_ticks()
+
+         elif item2_rect.collidepoint(mouse_pos) and coins >= 10 and buyteller == 1 and wave_delay == 0:
+            WEAPON_HEIGHT += 150
+            WEAPON_WIDTH += 150
+            weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+            weapon_img.blit(spritesheet5, (0, 0), (0, 0, 1111, 1100))
+            weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+            coins -= 10
+            buyteller -= 1
+            wave_delay += 1
+            last_purchase_time = pygame.time.get_ticks()
+
+         elif item3_rect.collidepoint(mouse_pos) and coins >= 10 and buyteller == 0 and wave_delay == 1:
+             WEAPON_WIDTH -= 150
+             WEAPON_HEIGHT -= 150
+             weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+             weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
+             weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+             coins -= 10
+             buyteller -= 1
+             last_purchase_time = pygame.time.get_ticks()
+
 
     current_time = pygame.time.get_ticks()
     if keys[pygame.K_z] and game_paused and not game_won and coins >= 5 and lives < 3 and current_time - last_purchase_time > purchase_cooldown:
