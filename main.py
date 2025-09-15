@@ -24,13 +24,15 @@ weapon_radius = 100  # distance from player to weapon center
 bounce_strength = 200
 lives = 3
 wave = 1
-coins = 0
+coins = 20
 score = 0
 buyteller = 1
 wave_delay = 0
 last_purchase_time = 0
 purchase_cooldown = 200
 in_menu = True
+extra_weapon_unlocked = False  
+extra_weapon_angle = 180       
 
 # --- Functie om monsters te maken ---
 def spawn_monsters(count):
@@ -54,6 +56,8 @@ weapon_x = SCREEN_WIDTH / 2
 weapon_y = SCREEN_HEIGHT - 250
 weapon_speed_x = 10
 weapon_speed_y = 10
+extra_rect = pygame.Rect(0, 0, WEAPON_WIDTH, WEAPON_HEIGHT)
+rotated_extra_weapon_img = pygame.Surface((WEAPON_WIDTH, WEAPON_HEIGHT), pygame.SRCALPHA)
 
 # INIT PYGAME
 pygame.init()
@@ -113,6 +117,7 @@ spritesheet3 = pygame.image.load('heart.png').convert_alpha()
 spritesheet4 = pygame.image.load('coin.png').convert_alpha()
 spritesheet5 = pygame.image.load("legendary_sword.png").convert_alpha()
 spritesheet6 = pygame.image.load("HAMMER.png").convert_alpha()
+extrasword_spritesheet = pygame.image.load("extrasword.png").convert_alpha()
 # SPELER AFBEELDING
 player_img = pygame.Surface((60, 90), pygame.SRCALPHA)
 player_img.blit(spritesheet, (0, 0), (0, 0, 1111, 1100))
@@ -131,7 +136,6 @@ weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
 #keuze menu achtergrond
 menu_background = pygame.image.load("keuzemenu.png").convert()
 menu_background = pygame.transform.scale(menu_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
 difficulty = pygame.image.load("difficulty.png").convert()
 difficulty = pygame.transform.scale(difficulty, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -147,6 +151,12 @@ coin_img = pygame.transform.scale(coin_img, (COIN_WIDTH, COIN_HEIGHT))
 # lock afbeelding
 lock_img = pygame.image.load("Lock.png").convert_alpha()
 lock_img = pygame.transform.scale(lock_img, (100, 100))  # adjust size to fit nicely
+
+#Extra sword
+extra_weapon_img = pygame.Surface((WEAPON_WIDTH, WEAPON_HEIGHT), pygame.SRCALPHA)
+extra_weapon_img.blit(extrasword_spritesheet, (0, 0), (0, 0, 100, 150))
+extra_weapon_img = pygame.transform.scale(extra_weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+rotated_extra_weapon_img = extra_weapon_img.copy()
 
 
 
@@ -386,6 +396,7 @@ while running:
             screen.blit(background_img, (0, 0))
             screen.blit(player_img, (player_x, player_y))
             screen.blit(weapon_img, (weapon_x, weapon_y))
+            
             for monster in monsters:
                 screen.blit(Monster_img, (monster["x"], monster["y"]))
 
@@ -446,7 +457,6 @@ while running:
             player_y += player_speed_y
 
         weapon_angle = (weapon_angle + 5) % 360
-
         weapon_x = player_x + PLAYER_WIDTH / 3.5 + weapon_radius * math.cos(math.radians(weapon_angle)) - WEAPON_WIDTH / 2
         weapon_y = player_y + PLAYER_HEIGHT / 3.5 + weapon_radius * math.sin(math.radians(weapon_angle)) - WEAPON_HEIGHT / 2
         rotated_weapon_img = pygame.transform.rotate(weapon_img, -weapon_angle)
@@ -486,13 +496,24 @@ while running:
                         dy /= distance
                         monster["x"] -= dx * monster["speed"]
                         monster["y"] -= dy * monster["speed"]
-
+    pygame.display.flip()
+    if extra_weapon_unlocked and not game_paused and not game_over and not game_won:
+     extra_weapon_angle = (extra_weapon_angle + 5) % 360  # draait rond speler
+     extra_weapon_x = player_x + PLAYER_WIDTH / 3.5 + weapon_radius * math.cos(math.radians(extra_weapon_angle)) - WEAPON_WIDTH / 2
+     extra_weapon_y = player_y + PLAYER_HEIGHT / 3.5 + weapon_radius * math.sin(math.radians(extra_weapon_angle)) - WEAPON_HEIGHT / 2
+     rotated_extra_weapon_img = pygame.transform.rotate(extra_weapon_img, -extra_weapon_angle)
+     extra_rect = rotated_extra_weapon_img.get_rect(center=(extra_weapon_x + WEAPON_WIDTH / 2, extra_weapon_y + WEAPON_HEIGHT / 2))
+     screen.blit(rotated_extra_weapon_img, extra_rect.topleft)
+    
+    
     # Altijd de achtergrond tonen (game of shop)
     screen.blit(background_img, (0, 0))
 
     if not game_paused:
       screen.blit(player_img, (player_x, player_y))
       screen.blit(rotated_weapon_img, rotated_rect.topleft)
+      if extra_weapon_unlocked:
+        screen.blit(rotated_extra_weapon_img, extra_rect.topleft)
 
     # Coins-icoon
     screen.blit(coin_img, (960, 10))
@@ -581,6 +602,24 @@ while running:
             dy /= distance
             monster["x"] += dx * bounce_strength
             monster["y"] += dy * bounce_strength
+    
+     if extra_weapon_unlocked:
+         # Gebruik het extra wapen mask en rect die net hierboven zijn aangemaakt
+         offset_x = monster_rect.left - extra_rect.left
+         offset_y = monster_rect.top - extra_rect.top
+         extra_weapon_mask = pygame.mask.from_surface(rotated_extra_weapon_img)
+         if extra_weapon_mask.overlap(monster_mask, (offset_x, offset_y)):
+          coins += 1
+          score += 10
+          dx = monster["x"] - extra_weapon_x
+          dy = monster["y"] - extra_weapon_y
+          distance = math.hypot(dx, dy)
+          if distance != 0:
+            dx /= distance
+            dy /= distance
+            monster["x"] += dx * bounce_strength
+            monster["y"] += dy * bounce_strength
+
 
     # ------------------------
     # Winconditie
@@ -618,24 +657,26 @@ while running:
             game_paused = True
 
    
+    # ------------------------ SHOP ------------------------
     if game_paused and not game_won:
         big_font = pygame.font.SysFont('default', 140)
         mid_font = pygame.font.SysFont('default', 55)
+
+        # Titel
         pause_text = font.render('Press Q to go to the next wave!', True, (255, 255, 255))
         text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, 80))
-        pygame.draw.rect(screen, (0,0,0), text_rect.inflate(20, 20))
+        pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))
         screen.blit(pause_text, text_rect)
-        price_text = big_font.render('5', True, (0, 0, 0))
-        text_rect = price_text.get_rect(topleft=(295, 450))
-        screen.blit(price_text, text_rect)
-        price_text1 = big_font.render('10', True, (0, 0, 0))
-        text_rect = price_text1.get_rect(topleft=(540, 440))
-        screen.blit(price_text1, text_rect)
-        price_text2 = big_font.render('20', True, (0, 0, 0))
-        text_rect = price_text2.get_rect(topleft=(835, 445))
-        screen.blit(price_text2, text_rect)
-     
-       # Maak klikbare tekst (Click Here)
+
+        # Prijzen
+        price_text1 = big_font.render('5', True, (0, 0, 0))
+        screen.blit(price_text1, (295, 450))
+        price_text2 = big_font.render('10', True, (0, 0, 0))
+        screen.blit(price_text2, (540, 440))
+        price_text3 = big_font.render('20', True, (0, 0, 0))
+        screen.blit(price_text3, (835, 445))
+
+        # Items Click Here
         item1_text = mid_font.render("Click Here", True, (0, 0, 0))
         item1_rect = item1_text.get_rect(topleft=(250, 550))
         screen.blit(item1_text, item1_rect)
@@ -648,35 +689,75 @@ while running:
         item3_rect = item3_text.get_rect(topleft=(818, 550))
         screen.blit(item3_text, item3_rect)
 
-        # Hover effect (Buy / Not enough coins)
+        # Hover effect
         mouse_pos = pygame.mouse.get_pos()
 
-        # Item 1 (5 coins, extra hart)
+        # Item 1
         if item1_rect.collidepoint(mouse_pos):
-         if coins >= 5 and lives < 3:
-            hover_text = mid_font.render("Buy", True, (0, 200, 0))
-         else:
-           hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
-         hover_rect = hover_text.get_rect(center=(item1_rect.centerx, item1_rect.bottom + 30))
-         screen.blit(hover_text, hover_rect)
+            if coins >= 5 and lives < 3:
+                hover_text = mid_font.render("Buy", True, (0, 200, 0))
+            else:
+                hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
+            hover_rect = hover_text.get_rect(center=(item1_rect.centerx, item1_rect.bottom + 30))
+            screen.blit(hover_text, hover_rect)
 
-# Item 2 (10 coins, legendary sword)
+        # Item 2 hover
         if item2_rect.collidepoint(mouse_pos):
-         if coins >= 10 and buyteller == 1 and wave_delay == 0:
-           hover_text = mid_font.render("Buy", True, (0, 200, 0))
-         else:
-          hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
-         hover_rect = hover_text.get_rect(center=(item2_rect.centerx, item2_rect.bottom + 30))
-         screen.blit(hover_text, hover_rect)
+                if buyteller == 1 and wave_delay == 0 and coins >= 10:
+                        hover_text = mid_font.render("Buy Legendary Sword", True, (0, 200, 0))
+                elif buyteller == 0 and wave_delay == 1 and coins >= 10:
+                        hover_text = mid_font.render("Buy Hammer", True, (0, 200, 0))
+                else:
+                        hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
+                hover_rect = hover_text.get_rect(center=(item2_rect.centerx, item2_rect.bottom + 30))
+                screen.blit(hover_text, hover_rect)
 
-        # Item 3 (10 coins, hammer)
+        # Item 3
         if item3_rect.collidepoint(mouse_pos):
-         if coins >= 10 and buyteller == 0 and wave_delay == 1:
-          hover_text = mid_font.render("Buy", True, (0, 200, 0))
-         else:
-             hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
-         hover_rect = hover_text.get_rect(center=(item3_rect.centerx, item3_rect.bottom + 30))
-         screen.blit(hover_text, hover_rect)
+            if coins >= 20 and not extra_weapon_unlocked:
+                hover_text = mid_font.render("Buy", True, (0, 200, 0))
+            else:
+                hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
+            hover_rect = hover_text.get_rect(center=(item3_rect.centerx, item3_rect.bottom + 30))
+            screen.blit(hover_text, hover_rect)
+
+        # Klik detectie
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # Item 1: extra hart
+            if item1_rect.collidepoint(mouse_pos) and coins >= 5 and lives < 3:
+                lives += 1
+                coins -= 5
+                last_purchase_time = pygame.time.get_ticks()
+
+            # Item 2: Legendary Sword of Hammer
+            elif item2_rect.collidepoint(mouse_pos) and coins >= 10:
+                if buyteller == 1 and wave_delay == 0:
+                    # Koop Legendary Sword
+                    WEAPON_HEIGHT += 150
+                    WEAPON_WIDTH += 150
+                    weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+                    weapon_img.blit(spritesheet5, (0, 0), (0, 0, 1111, 1100))
+                    weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+                    coins -= 10
+                    buyteller -= 1
+                    wave_delay += 1
+                    last_purchase_time = pygame.time.get_ticks()
+                elif buyteller == 0 and wave_delay == 1:
+                    # Koop Hammer
+                    WEAPON_WIDTH -= 150
+                    WEAPON_HEIGHT -= 150
+                    weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+                    weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
+                    weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+                    coins -= 10
+                    buyteller -= 1
+                    last_purchase_time = pygame.time.get_ticks()
+
+            # Item 3: Extra wapen
+            elif item3_rect.collidepoint(mouse_pos) and coins >= 20 and not extra_weapon_unlocked:
+                coins -= 20
+                extra_weapon_unlocked = True
+
 
         # Klik detectie
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -696,7 +777,7 @@ while running:
             wave_delay += 1
             last_purchase_time = pygame.time.get_ticks()
 
-         elif item3_rect.collidepoint(mouse_pos) and coins >= 10 and buyteller == 0 and wave_delay == 1:
+         elif item2_rect.collidepoint(mouse_pos) and coins >= 10 and buyteller == 0 and wave_delay == 1:
              WEAPON_WIDTH -= 150
              WEAPON_HEIGHT -= 150
              weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
@@ -705,34 +786,12 @@ while running:
              coins -= 10
              buyteller -= 1
              last_purchase_time = pygame.time.get_ticks()
+         elif item3_rect.collidepoint(mouse_pos) and coins >= 20 and not extra_weapon_unlocked:
+                 coins -= 20
+                 extra_weapon_unlocked = True    
 
 
     current_time = pygame.time.get_ticks()
-    if keys[pygame.K_z] and game_paused and not game_won and coins >= 5 and lives < 3 and current_time - last_purchase_time > purchase_cooldown:
-     lives += 1
-     coins -= 5
-     last_purchase_time = current_time
- 
-    if keys[pygame.K_x] and game_paused and not game_won and coins >= 10 and buyteller == 1 and wave_delay == 0 and current_time - last_purchase_time > purchase_cooldown:
-        WEAPON_HEIGHT += 150
-        WEAPON_WIDTH += 150
-        weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
-        weapon_img.blit(spritesheet5, (0, 0), (0, 0, 1111, 1100))
-        weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
-        coins -= 10
-        buyteller -= 1
-        wave_delay += 1
-        last_purchase_time = current_time
-
-    if keys[pygame.K_x] and game_paused and not game_won and coins >= 10 and buyteller == 0 and wave_delay == 1 and current_time - last_purchase_time > purchase_cooldown:
-        WEAPON_WIDTH -= 150
-        WEAPON_HEIGHT -= 150
-        weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
-        weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
-        weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
-        coins -= 10
-        buyteller -= 1
-        last_purchase_time = current_time
 
     if lives <= 0:
        game_over = True
@@ -773,6 +832,8 @@ while running:
             game_paused = False
             game_over = False
             in_menu = True
+            extra_weapon_unlocked = False
+            extra_weapon_angle = 180
 
     if game_won:
     # Unlock next difficulty only on win
