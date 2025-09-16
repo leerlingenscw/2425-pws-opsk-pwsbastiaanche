@@ -665,28 +665,19 @@ while running:
         # Titel
         pause_text = font.render('Press Q to go to the next wave!', True, (255, 255, 255))
         text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, 80))
-        pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))
         screen.blit(pause_text, text_rect)
 
-        # Prijzen
-        price_text1 = big_font.render('5', True, (0, 0, 0))
-        screen.blit(price_text1, (295, 450))
-        price_text2 = big_font.render('10', True, (0, 0, 0))
-        screen.blit(price_text2, (540, 440))
-        price_text3 = big_font.render('20', True, (0, 0, 0))
-        screen.blit(price_text3, (835, 445))
-
         # Items Click Here
-        item1_text = mid_font.render("Click Here", True, (0, 0, 0))
-        item1_rect = item1_text.get_rect(topleft=(250, 550))
+        item1_text = mid_font.render("extra heart", True, (255, 255, 255))
+        item1_rect = item1_text.get_rect(topleft=(170, 600))
         screen.blit(item1_text, item1_rect)
 
-        item2_text = mid_font.render("Click Here", True, (0, 0, 0))
-        item2_rect = item2_text.get_rect(topleft=(518, 550))
+        item2_text = mid_font.render("new weapon", True, (255, 255, 255))
+        item2_rect = item2_text.get_rect(topleft=(518, 600))
         screen.blit(item2_text, item2_rect)
 
-        item3_text = mid_font.render("Click Here", True, (0, 0, 0))
-        item3_rect = item3_text.get_rect(topleft=(818, 550))
+        item3_text = mid_font.render("extra weapon", True, (255, 255, 255))
+        item3_rect = item3_text.get_rect(topleft=(898, 600))
         screen.blit(item3_text, item3_rect)
 
         # Hover effect
