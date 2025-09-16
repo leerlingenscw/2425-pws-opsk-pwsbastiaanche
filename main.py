@@ -664,6 +664,15 @@ while running:
 
         # Titel
         pause_text = font.render('Press Q to go to the next wave!', True, (255, 255, 255))
+        text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, 140))
+        screen.blit(pause_text, text_rect)
+
+        pause_text = font.render('Click the text below to buy.', True, (255, 255, 255))
+        text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, 110))
+        screen.blit(pause_text, text_rect)
+
+        #Sanji text
+        pause_text = font.render('Welcome to Sanji\'s shop hero!', True, (255, 255, 255))
         text_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, 80))
         screen.blit(pause_text, text_rect)
 
