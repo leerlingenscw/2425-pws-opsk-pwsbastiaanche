@@ -29,7 +29,7 @@ score = 0
 buyteller = 1
 wave_delay = 0
 last_purchase_time = 0
-purchase_cooldown = 200
+purchase_cooldown = 800
 in_menu = True
 extra_weapon_unlocked = False  
 extra_weapon_angle = 180       
@@ -44,6 +44,15 @@ def spawn_monsters(count):
             "speed": 4
         })
     return monsters
+
+#Cooldown functie
+def can_purchase():
+    global last_purchase_time
+    current_time = pygame.time.get_ticks()
+    if current_time - last_purchase_time >= purchase_cooldown:
+        last_purchase_time = current_time
+        return True
+    return False
 
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
@@ -725,70 +734,42 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Item 1: extra hart
             if item1_rect.collidepoint(mouse_pos) and coins >= 5 and lives < 3:
-                lives += 1
-                coins -= 5
-                last_purchase_time = pygame.time.get_ticks()
+                if can_purchase():
+                    lives += 1
+                    coins -= 5
+                    last_purchase_time = pygame.time.get_ticks()
 
             # Item 2: Legendary Sword of Hammer
             elif item2_rect.collidepoint(mouse_pos) and coins >= 10:
                 if buyteller == 1 and wave_delay == 0:
-                    # Koop Legendary Sword
-                    WEAPON_HEIGHT += 150
-                    WEAPON_WIDTH += 150
-                    weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
-                    weapon_img.blit(spritesheet5, (0, 0), (0, 0, 1111, 1100))
-                    weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
-                    coins -= 10
-                    buyteller -= 1
-                    wave_delay += 1
-                    last_purchase_time = pygame.time.get_ticks()
+                    #Legandarysword kopen
+                    if can_purchase():
+                        WEAPON_HEIGHT += 190
+                        WEAPON_WIDTH += 190
+                        weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+                        weapon_img.blit(spritesheet5, (0, 0), (0, 0, 1111, 1100))
+                        weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+                        coins -= 10
+                        buyteller -= 1
+                        wave_delay += 1
+                        last_purchase_time = pygame.time.get_ticks()
                 elif buyteller == 0 and wave_delay == 1:
                     # Koop Hammer
-                    WEAPON_WIDTH -= 150
-                    WEAPON_HEIGHT -= 150
-                    weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
-                    weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
-                    weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
-                    coins -= 10
-                    buyteller -= 1
-                    last_purchase_time = pygame.time.get_ticks()
+                    if can_purchase():
+                        WEAPON_WIDTH -= 150
+                        WEAPON_HEIGHT -= 150
+                        weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
+                        weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
+                        weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
+                        coins -= 10
+                        buyteller -= 1
+                        last_purchase_time = pygame.time.get_ticks()
 
             # Item 3: Extra wapen
-            elif item3_rect.collidepoint(mouse_pos) and coins >= 20 and not extra_weapon_unlocked:
-                coins -= 20
-                extra_weapon_unlocked = True
-
-
-        # Klik detectie
-        if event.type == pygame.MOUSEBUTTONDOWN:
-         if item1_rect.collidepoint(mouse_pos) and coins >= 5 and lives < 3:
-           lives += 1
-           coins -= 5
-           last_purchase_time = pygame.time.get_ticks()
-
-         elif item2_rect.collidepoint(mouse_pos) and coins >= 10 and buyteller == 1 and wave_delay == 0:
-            WEAPON_HEIGHT += 150
-            WEAPON_WIDTH += 150
-            weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
-            weapon_img.blit(spritesheet5, (0, 0), (0, 0, 1111, 1100))
-            weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
-            coins -= 10
-            buyteller -= 1
-            wave_delay += 1
-            last_purchase_time = pygame.time.get_ticks()
-
-         elif item2_rect.collidepoint(mouse_pos) and coins >= 10 and buyteller == 0 and wave_delay == 1:
-             WEAPON_WIDTH -= 150
-             WEAPON_HEIGHT -= 150
-             weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
-             weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
-             weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
-             coins -= 10
-             buyteller -= 1
-             last_purchase_time = pygame.time.get_ticks()
-         elif item3_rect.collidepoint(mouse_pos) and coins >= 20 and not extra_weapon_unlocked:
-                 coins -= 20
-                 extra_weapon_unlocked = True    
+                elif item3_rect.collidepoint(mouse_pos) and coins >= 20 and not extra_weapon_unlocked:
+                  if can_purchase(): 
+                    coins -= 20
+                    extra_weapon_unlocked = True
 
 
     current_time = pygame.time.get_ticks()
