@@ -54,6 +54,48 @@ def can_purchase():
         return True
     return False
 
+#Tussenscherm
+def show_between_wave_screen():
+    """Tekent het tussenscherm en retourneert de yes/no rects."""
+    # achtergrond
+    screen.blit(between_wave_bg, (0, 0))
+
+    # Titel (boven midden)
+    font_big = pygame.font.SysFont("default", 48)
+    title_text = font_big.render("Congratulations! You have made it to the next wave!", True, (255, 255, 255))
+    title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 120))
+    screen.blit(title_text, title_rect)
+
+    # Vraag onder de titel
+    font_small = pygame.font.SysFont("default", 36)
+    question = font_small.render("Would you like to go to the shop?", True, (255, 255, 255))
+    question_rect = question.get_rect(center=(SCREEN_WIDTH // 2, 180))
+    screen.blit(question, question_rect)
+
+    # Ja / Nee knoppen (onder de vraag)
+    yes_rect = pygame.Rect(SCREEN_WIDTH//2 - 120, 260, 100, 50)
+    no_rect  = pygame.Rect(SCREEN_WIDTH//2 + 20, 260, 100, 50)
+
+    pygame.draw.rect(screen, (0, 200, 0), yes_rect)  # groen
+    pygame.draw.rect(screen, (200, 0, 0), no_rect)   # rood
+
+    yes_text = font_small.render("Yes", True, (0, 0, 0))
+    no_text  = font_small.render("No", True, (0, 0, 0))
+
+    screen.blit(yes_text, (yes_rect.centerx - yes_text.get_width()//2,
+                           yes_rect.centery - yes_text.get_height()//2))
+    screen.blit(no_text, (no_rect.centerx - no_text.get_width()//2,
+                          no_rect.centery - no_text.get_height()//2))
+
+    # Karakter naast de tekst: gebruik geselecteerde character of standaard speler
+    char_img = selected_character_img if selected_character_img else player_img
+    # teken links van de tekst (center Y met question)
+    char_x = SCREEN_WIDTH//2 - 350
+    char_y = 180
+    screen.blit(char_img, (char_x, char_y))
+
+    return yes_rect, no_rect
+
 # INIT PLAYER
 player_x = SCREEN_WIDTH / 2
 player_y = SCREEN_HEIGHT - 100
@@ -167,6 +209,10 @@ extra_weapon_img.blit(extrasword_spritesheet, (0, 0), (0, 0, 100, 150))
 extra_weapon_img = pygame.transform.scale(extra_weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
 rotated_extra_weapon_img = extra_weapon_img.copy()
 
+# (na) background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+between_wave_bg = pygame.image.load("tussenscherm.png").convert()
+between_wave_bg = pygame.transform.scale(between_wave_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 
 
 # MEERDERE MONSTERS AANMAKEN
@@ -187,6 +233,7 @@ start_ticks = pygame.time.get_ticks()
 game_paused = False
 game_over = False
 game_won = False
+in_between_wave = False
 easy_unlocked = True
 medium_unlocked = False
 hard_unlocked = False
@@ -197,6 +244,38 @@ running = True
 enter_cooldown = 200  # cooldown in ms voor Enter
 
 while running:
+    # --- Tussenscherm afhandelen (voorkomt dat rest van game doorloopt) ---
+    if in_between_wave:
+        # teken scherm + krijg knop rects terug
+        yes_rect, no_rect = show_between_wave_screen()
+        pygame.display.flip()
+
+        # events alleen voor tussenscherm
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pos = event.pos
+                if yes_rect.collidepoint(mouse_pos):
+                    # ga naar shop
+                    in_between_wave = False
+                    game_paused = True
+                    background_img = pygame.image.load("shop.png").convert()
+                    background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                    # (optioneel) reset last_purchase_time zodat shop direct werkt
+                    last_purchase_time = pygame.time.get_ticks()
+                elif no_rect.collidepoint(mouse_pos):
+                    # ga direct verder met de volgende wave
+                    in_between_wave = False
+                    # volg dezelfde flow als bij Q: start countdown naar next wave
+                    wave += 1
+                    countdown_active = True
+                    countdown_start_ticks = pygame.time.get_ticks()
+                    background_img = pygame.image.load("image.png").convert()
+                    background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        fps_clock.tick(FPS)
+        continue   # heel belangrijk: skip rest van de loop zolang tussenscherm actief
     # ---------------- EVENTS ----------------
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -432,11 +511,7 @@ while running:
     down_time = max(0, 300000000000000 - elapsed_sec)
 
     if remaining_time == 0 and not game_paused:
-        print("Time's up!")
-        game_paused = True
-        background_img = pygame.image.load("shop.png").convert()
-        background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
+        in_between_wave = True
 
 
     if down_time == 0 and game_paused:
@@ -553,8 +628,8 @@ while running:
      player_rect = pygame.Rect(
         player_x + PLAYER_WIDTH * 0.1,
         player_y + PLAYER_HEIGHT * 0.1,
-        PLAYER_WIDTH * 0.8,
-        PLAYER_HEIGHT * 0.8
+        PLAYER_WIDTH * 0.7,
+        PLAYER_HEIGHT * 0.7
     )
 
      monster_rect = pygame.Rect(
@@ -756,8 +831,8 @@ while running:
                 elif buyteller == 0 and wave_delay == 1:
                     # Koop Hammer
                     if can_purchase():
-                        WEAPON_WIDTH -= 150
-                        WEAPON_HEIGHT -= 150
+                        WEAPON_WIDTH -= 180
+                        WEAPON_HEIGHT -= 180
                         weapon_img = pygame.Surface((100, 150), pygame.SRCALPHA)
                         weapon_img.blit(spritesheet6, (0, 0), (0, 0, 1111, 1100))
                         weapon_img = pygame.transform.scale(weapon_img, (WEAPON_WIDTH, WEAPON_HEIGHT))
