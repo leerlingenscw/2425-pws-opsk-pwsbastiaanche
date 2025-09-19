@@ -41,8 +41,8 @@ def spawn_monsters(count):
     monsters = []
     for i in range(count):
         monsters.append({
-            "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
-            "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
+            "x": random.randint(0, 100),
+            "y": random.randint(0, 100),
             "speed": 4
         })
     return monsters
@@ -129,7 +129,7 @@ intro_text_font = pygame.font.SysFont("default", 40)
 intro_title = "Wanted in Greece!"
 
 intro_texts = [
-    "Welcome brave warrior!\nYou have been chosen by us, the greek gods, to elimenate a great threat.\nThere are dangerous monsters in these woods\nand you may be greeces final hope.\n\n\n\n\nPress Enter to continue ",
+    "Welcome brave warrior!\nYou have been chosen by us, the Greek gods, to elimenate a great threat.\nThere are dangerous monsters in these woods\nand you may be greeces final hope.\n\n\n\n\nPress Enter to continue ",
     "Now great warrior you have to learn to control yourself.\nYou can use W, to move up, A to go left,\nS to go down and D to go right.\nYou will have 3 hearts, everytime you touch a\nmonster you shall lose a heart.\nThis might prove harder than it seems.\n\n\nPress Enter to continue",
     "You also have a weapon that cirkels around you.\nThat might help you get rid of those foul creatures.\nIf you manage to hit a creature i will bless you with some\npainfully ordenairy ideal not transparant saphires.\nBut you may call them points.\nIf you have 500 points you win!\n\n\nPress Enter to continue",
     "Monsters naturaly spawn coins when you hit them.\nSo save up and you may be able to buy some interesting stuff in the shop.\n\n\n\n\n\n\nPress Enter to continue ",
@@ -221,8 +221,8 @@ between_wave_bg = pygame.transform.scale(between_wave_bg, (SCREEN_WIDTH, SCREEN_
 monsters = []
 for i in range(MONSTER_COUNT):
     monsters.append({
-        "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
-        "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
+        "x": random.randint(0, 100),
+        "y": random.randint(0, 100),
         "speed": 4
     })
 
@@ -783,7 +783,7 @@ while running:
             if coins >= 5 and lives < 3:
                 hover_text = mid_font.render("Buy", True, (0, 200, 0))
             elif coins >= 5 and lives == 3:
-                hover_text = mid_font.render("ALready 3 hearts!", True, (0, 200, 0))
+                hover_text = mid_font.render("Already 3 hearts!", True, (0, 200, 0))
             else:
                 hover_text = mid_font.render("Not enough coins", True, (200, 0, 0))
             hover_rect = hover_text.get_rect(center=(item1_rect.centerx, item1_rect.bottom + 30))
@@ -861,7 +861,7 @@ while running:
        game_over = True
     
     if game_over:
-        game_text = font.render("GAME OVER - Druk op 'R' om opnieuw te starten", True, (255, 255, 255))
+        game_text = font.render("GAME OVER - Press 'R' to restart!", True, (255, 255, 255))
         text_rect = game_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200))
         pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))
         screen.blit(game_text, text_rect)
@@ -889,8 +889,8 @@ while running:
             monsters = []
             for i in range(MONSTER_COUNT):
                 monsters.append({
-                    "x": random.randint(0, SCREEN_WIDTH - MONSTER_WIDTH),
-                    "y": random.randint(0, SCREEN_HEIGHT - MONSTER_HEIGHT),
+                    "x": random.randint(0, 100),
+                    "y": random.randint(0, 100),
                     "speed": 5
                 })
             game_paused = False
