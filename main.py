@@ -841,8 +841,8 @@ while running:
                         last_purchase_time = pygame.time.get_ticks()
 
             # Item 3: Extra wapen
-                elif item3_rect.collidepoint(mouse_pos) and coins >= 20 and not extra_weapon_unlocked:
-                  if can_purchase(): 
+            elif item3_rect.collidepoint(mouse_pos) and coins >= 20 and not extra_weapon_unlocked:
+                if can_purchase(): 
                     coins -= 20
                     extra_weapon_unlocked = True
 
