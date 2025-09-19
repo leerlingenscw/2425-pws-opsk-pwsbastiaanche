@@ -934,6 +934,8 @@ while running:
             game_over = False
             game_won = False
             in_menu = True
+            extra_weapon_unlocked = False
+            
 
     pygame.display.flip()
     fps_clock.tick(FPS)
