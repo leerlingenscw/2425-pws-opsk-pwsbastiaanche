@@ -131,7 +131,7 @@ intro_title = "Wanted in Greece!"
 intro_texts = [
     "Welcome brave warrior!\nYou have been chosen by us, the Greek gods, to elimenate a great threat.\nThere are dangerous monsters in these woods\nand you may be greeces final hope.\n\n\n\n\nPress Enter to continue ",
     "Now great warrior you have to learn to control yourself.\nYou can use W, to move up, A to go left,\nS to go down and D to go right.\nYou will have 3 hearts, everytime you touch a\nmonster you shall lose a heart.\nThis might prove harder than it seems.\n\n\nPress Enter to continue",
-    "You also have a weapon that cirkels around you.\nThat might help you get rid of those foul creatures.\nIf you manage to hit a creature i will bless you with some\npainfully ordenairy ideal not transparant saphires.\nBut you may call them points.\nIf you have 500 points you win!\n\n\nPress Enter to continue",
+    "You also have a weapon that cirkels around you.\nThat might help you get rid of those foul creatures.\nIf you manage to hit a creature i will bless you with some\nPrecisely Ordered Indicators Nudging Toward Scores.\nBut you may call them points.\nIf you have 500 points you win!\n\n\nPress Enter to continue",
     "Monsters naturaly spawn coins when you hit them.\nSo save up and you may be able to buy some interesting stuff in the shop.\n\n\n\n\n\n\nPress Enter to continue ",
     "We have selected multiple challenges for you to complete.\nYou need to prove your worthy by completing the easier raids\nto be able to do the harder ones.\n\n\n\n\n\nPress Enter to continue"
 ]
