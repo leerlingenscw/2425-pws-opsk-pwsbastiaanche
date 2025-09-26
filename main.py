@@ -351,7 +351,7 @@ while running:
     if in_character_select:
         if in_menu:
          screen.blit(menu_background, (0, 0))
-         title_text = font.render("Choose a Character by clicking on it!", True, (255, 255, 255))
+         title_text = font.render("Choose a Character by clicking on it!", True, (0, 0, 0))
          title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
          screen.blit(title_text, title_rect)
 
