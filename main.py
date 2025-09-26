@@ -379,7 +379,7 @@ while running:
     # ---------------- MENU SCHERM ----------------
     if in_menu:
         screen.blit(difficulty, (0,0))
-        title_text = font.render("Choose a Level by clicking on it!", True, (255, 255, 255))
+        title_text = font.render("You must now pick the difficulty!", True, (255, 255, 255))
         easy_text = font.render("Easy (3 monsters)", True, (255, 255, 255))
         medium_text = font.render("Medium (5 monsters)", True, (255, 255, 255))
         hard_text = font.render("Hard (7 monsters)", True, (255, 255, 255))
