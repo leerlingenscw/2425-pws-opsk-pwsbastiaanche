@@ -387,7 +387,7 @@ while running:
         # Rectangles (klikgebieden)
         easy_rect = easy_text.get_rect(center=(SCREEN_WIDTH//5, 400))
         medium_rect = medium_text.get_rect(center=(SCREEN_WIDTH//2, 400))
-        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//1.29, 400))
+        hard_rect = hard_text.get_rect(center=(SCREEN_WIDTH//1.25, 400))
 
         mouse_pos = pygame.mouse.get_pos()
 
