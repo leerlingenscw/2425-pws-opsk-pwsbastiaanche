@@ -121,10 +121,10 @@ fps_clock = pygame.time.Clock()
 # ---- INTRO SCHERM VARIABELEN ----
 in_intro = True
 intro_background = pygame.image.load("beginscherm1.png").convert()
-intro_background = pygame.transform.scale(intro_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+intro_background = pygame.transform.scale(intro_background, (SCREEN_WIDTH , SCREEN_HEIGHT ))
 
 intro_title_font = pygame.font.SysFont("default", 80)
-intro_text_font = pygame.font.SysFont("default", 40)
+intro_text_font = pygame.font.SysFont("default", 38)
 
 intro_title = "Wanted in Greece!"
 
@@ -321,7 +321,7 @@ while running:
         y_offset = 0
         for line in lines:
             text_surface = intro_text_font.render(line, True, (0, 0, 0))
-            text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + y_offset - 190))
+            text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2 + 100, SCREEN_HEIGHT // 2 + y_offset - 190))
             screen.blit(text_surface, text_rect)
             y_offset += 50
 
